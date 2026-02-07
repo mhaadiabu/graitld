@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "dev": "concurrently \"bun dev:backend\" \"bun dev:frontend\"",
     "dev:frontend": "next dev",
     "dev:backend": "convex dev",
     "build": "next build",
