@@ -34,3 +34,21 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Environment Variables
+
+This project uses environment variables for configuration. You'll need to set up a `.env.local` file in the root of your project.
+
+**Required Variables:**
+
+- `NEXT_PUBLIC_CONVEX_URL`: Your Convex deployment URL. This is typically found in your Convex dashboard.
+- `CONVEX_DEPLOYMENT`: The name of your Convex deployment (e.g., `convex-example-app`).
+
+**Example `.env.local`:**
+
+```
+NEXT_PUBLIC_CONVEX_URL="https://example-app-123.convex.cloud"
+CONVEX_DEPLOYMENT="convex-example-app"
+```
+
+You can obtain these values from your Convex dashboard after deploying your Convex backend.
