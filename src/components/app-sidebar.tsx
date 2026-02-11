@@ -70,7 +70,7 @@ export const AppSidebar = () => {
             {sidebarItems.map(({ icon, href, title }) => (
               <SidebarMenuItem key={title}>
                 <SidebarMenuButton>
-                  <Link href={href as Route} className='flex gap-2 items-center'>
+                  <Link href={href as Route} className='flex items-center gap-2'>
                     {icon && <HugeiconsIcon icon={icon} />}
                     <span>{title}</span>
                   </Link>

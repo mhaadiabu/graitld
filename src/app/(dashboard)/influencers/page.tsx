@@ -10,7 +10,7 @@ const InfluencersPage = () => {
 
   if (influencers === undefined) {
     return (
-      <div className='p-4 space-y-4'>
+      <div className='space-y-4 p-4'>
         <Skeleton className='h-10 w-1/2' />
         <Skeleton className='h-24 w-full' />
         <Skeleton className='h-6 w-1/3' />
@@ -25,15 +25,15 @@ const InfluencersPage = () => {
 
   return (
     <div className='p-4'>
-      <h1 className='text-2xl font-bold mb-4'>Influencers</h1>
+      <h1 className='mb-4 text-2xl font-bold'>Influencers</h1>
       <InfluencerForm /> {/* Use the new InfluencerForm component */}
-      <h2 className='text-xl font-semibold mb-4'>Your Influencers</h2>
+      <h2 className='mb-4 text-xl font-semibold'>Your Influencers</h2>
       {influencers.length === 0 ? (
         <p>No influencers added yet.</p>
       ) : (
         <ul className='space-y-2'>
           {influencers.map((influencer) => (
-            <li key={influencer._id} className='p-3 border rounded-md shadow-sm'>
+            <li key={influencer._id} className='rounded-md border p-3 shadow-sm'>
               <p className='font-medium'>
                 {influencer.name} ({influencer.platform})
               </p>

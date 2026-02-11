@@ -1,19 +1,18 @@
+import { Authenticated } from 'convex/react';
+
+import { AppSidebar } from '@/src/components/app-sidebar';
 import { SidebarProvider, SidebarTrigger } from '@/src/components/ui/sidebar';
 
-import { AppSidebar } from '../../components/app-sidebar';
-
-export default function DashboardLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <main>
-        <SidebarTrigger />
-        {children}
-      </main>
-    </SidebarProvider>
+    <Authenticated>
+      <SidebarProvider>
+        <AppSidebar />
+        <main>
+          <SidebarTrigger />
+          {children}
+        </main>
+      </SidebarProvider>
+    </Authenticated>
   );
 }
