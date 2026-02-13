@@ -9,8 +9,9 @@ import {
   UserGroupIcon,
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
+import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 const pages = [
   { title: 'Overview', href: '/', icon: DashboardSquare02Icon },
@@ -28,7 +29,6 @@ interface CommandSearchProps {
 
 export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
   const router = useRouter();
-  const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -36,21 +36,10 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
     p.title.toLowerCase().includes(query.toLowerCase())
   );
 
-  useEffect(() => {
-    if (open) {
-      setQuery('');
-      setSelectedIndex(0);
-      setTimeout(() => inputRef.current?.focus(), 50);
-    }
-  }, [open]);
-
-  const navigate = useCallback(
-    (href: string) => {
-      onOpenChange(false);
-      router.push(href);
-    },
-    [router, onOpenChange]
-  );
+  const navigate = (href: Route) => {
+    onOpenChange(false);
+    router.push(href);
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
@@ -86,7 +75,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
             className="text-muted-foreground"
           />
           <input
-            ref={inputRef}
+            autoFocus
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
