@@ -36,9 +36,9 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
     p.title.toLowerCase().includes(query.toLowerCase())
   );
 
-  const navigate = (href: Route) => {
+  const navigate = (href: string) => {
     onOpenChange(false);
-    router.push(href);
+    router.push(href as Route);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
