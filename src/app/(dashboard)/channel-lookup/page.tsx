@@ -17,6 +17,7 @@ import { api } from '~convex/_generated/api';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // ── Mock Social Blade API ────────────────────────────────────────────
@@ -241,20 +242,17 @@ export default function ChannelLookupPage() {
         </div>
 
         <form onSubmit={handleSearch} className='flex gap-3'>
-          <div className='relative flex-1'>
-            <HugeiconsIcon
-              icon={Search01Icon}
-              size={16}
-              className='absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground'
-            />
-            <input
+          <InputGroup className='flex-1 bg-background'>
+            <InputGroupAddon align='inline-start'>
+              <HugeiconsIcon icon={Search01Icon} size={16} className='text-muted-foreground' />
+            </InputGroupAddon>
+            <InputGroupInput
               type='text'
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder='e.g. @kwameasante, youtube.com/@channel, tiktok.com/@user'
-              className='w-full rounded-lg border border-input bg-background py-2.5 pr-4 pl-10 text-sm transition-colors placeholder:text-muted-foreground/50 focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none'
             />
-          </div>
+          </InputGroup>
           <Button
             type='submit'
             disabled={isSearching || !query.trim()}
