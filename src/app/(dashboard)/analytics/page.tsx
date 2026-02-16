@@ -15,6 +15,8 @@ import {
 } from 'recharts';
 import { api } from '~convex/_generated/api';
 
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const COMPLIANCE_COLORS: Record<string, string> = {
@@ -70,38 +72,53 @@ export default function AnalyticsPage() {
     <div className='stagger-children space-y-6'>
       {/* Summary cards */}
       <div className='grid gap-4 sm:grid-cols-3'>
-        <div className='rounded-xl border border-border/60 bg-card p-5'>
-          <p className='text-xs font-medium tracking-wider text-muted-foreground uppercase'>
-            Total Tax Liability
-          </p>
-          <p className='mt-2 font-heading text-2xl font-bold text-accent'>
-            GH&#8373;{metrics.totalTaxLiability.toLocaleString()}
-          </p>
-        </div>
-        <div className='rounded-xl border border-border/60 bg-card p-5'>
-          <p className='text-xs font-medium tracking-wider text-muted-foreground uppercase'>
-            Approved Assessments
-          </p>
-          <p className='mt-2 font-heading text-2xl font-bold text-success'>
-            {metrics.approvedAssessments}
-          </p>
-        </div>
-        <div className='rounded-xl border border-border/60 bg-card p-5'>
-          <p className='text-xs font-medium tracking-wider text-muted-foreground uppercase'>
-            Disputed Cases
-          </p>
-          <p className='mt-2 font-heading text-2xl font-bold text-destructive'>
-            {metrics.disputedAssessments}
-          </p>
-        </div>
+        <Card size='sm'>
+          <CardHeader>
+            <CardTitle className='text-xs font-medium tracking-wider text-muted-foreground uppercase'>
+              Total Tax Liability
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className='font-heading text-2xl font-bold text-accent'>
+              GH&#8373;{metrics.totalTaxLiability.toLocaleString()}
+            </p>
+          </CardContent>
+        </Card>
+        <Card size='sm'>
+          <CardHeader>
+            <CardTitle className='text-xs font-medium tracking-wider text-muted-foreground uppercase'>
+              Approved Assessments
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className='font-heading text-2xl font-bold text-success'>
+              {metrics.approvedAssessments}
+            </p>
+          </CardContent>
+        </Card>
+        <Card size='sm'>
+          <CardHeader>
+            <CardTitle className='text-xs font-medium tracking-wider text-muted-foreground uppercase'>
+              Disputed Cases
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className='font-heading text-2xl font-bold text-destructive'>
+              {metrics.disputedAssessments}
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className='grid gap-6 lg:grid-cols-2'>
         {/* Tax gap analysis */}
-        <div className='rounded-xl border border-border/60 bg-card p-5'>
-          <h3 className='mb-4 font-heading text-sm font-semibold tracking-wider text-muted-foreground uppercase'>
-            Tax Gap Analysis
-          </h3>
+        <Card>
+          <CardHeader>
+            <CardTitle className='font-heading text-sm font-semibold tracking-wider text-muted-foreground uppercase'>
+              Tax Gap Analysis
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
           {metrics.totalTaxLiability > 0 ? (
             <ResponsiveContainer width='100%' height={280}>
               <BarChart data={taxGapData} layout='vertical'>
@@ -147,13 +164,17 @@ export default function AnalyticsPage() {
               No tax data available yet.
             </div>
           )}
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Compliance breakdown */}
-        <div className='rounded-xl border border-border/60 bg-card p-5'>
-          <h3 className='mb-4 font-heading text-sm font-semibold tracking-wider text-muted-foreground uppercase'>
-            Compliance Distribution
-          </h3>
+        <Card>
+          <CardHeader>
+            <CardTitle className='font-heading text-sm font-semibold tracking-wider text-muted-foreground uppercase'>
+              Compliance Distribution
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
           {compliance && compliance.some((c) => c.count > 0) ? (
             <div className='flex flex-col items-center'>
               <ResponsiveContainer width='100%' height={220}>
@@ -202,13 +223,17 @@ export default function AnalyticsPage() {
               No compliance data yet.
             </div>
           )}
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Regional distribution */}
-        <div className='rounded-xl border border-border/60 bg-card p-5'>
-          <h3 className='mb-4 font-heading text-sm font-semibold tracking-wider text-muted-foreground uppercase'>
-            Regional Distribution
-          </h3>
+        <Card>
+          <CardHeader>
+            <CardTitle className='font-heading text-sm font-semibold tracking-wider text-muted-foreground uppercase'>
+              Regional Distribution
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
           {regional && regional.length > 0 ? (
             <div className='space-y-2'>
               {regional.slice(0, 8).map((r) => {
@@ -235,47 +260,63 @@ export default function AnalyticsPage() {
               No regional data yet.
             </div>
           )}
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Audit risk — top influencers by revenue (risk proxy) */}
-        <div className='rounded-xl border border-border/60 bg-card p-5'>
-          <h3 className='mb-4 font-heading text-sm font-semibold tracking-wider text-muted-foreground uppercase'>
-            Audit Risk Assessment
-          </h3>
-          <p className='mb-4 text-xs text-muted-foreground'>
-            Higher revenue with lower compliance scores indicate higher audit priority.
-          </p>
-          {topInfluencers && topInfluencers.length > 0 ? (
-            <div className='space-y-2'>
-              {topInfluencers.slice(0, 6).map((inf) => {
-                const score = inf.complianceScore ?? 50;
-                const risk = score < 40 ? 'High' : score < 70 ? 'Medium' : 'Low';
-                const riskColor =
-                  risk === 'High'
-                    ? 'text-destructive'
-                    : risk === 'Medium'
-                      ? 'text-warning'
-                      : 'text-success';
-                return (
-                  <div
-                    key={inf._id}
-                    className='flex items-center justify-between rounded-lg px-3 py-2 hover:bg-muted/30'
-                  >
-                    <div>
-                      <p className='text-sm font-medium'>{inf.name}</p>
-                      <p className='text-xs text-muted-foreground'>Score: {score}/100</p>
+        <Card>
+          <CardHeader>
+            <CardTitle className='font-heading text-sm font-semibold tracking-wider text-muted-foreground uppercase'>
+              Audit Risk Assessment
+            </CardTitle>
+            <CardDescription>
+              Higher revenue with lower compliance scores indicate higher audit priority.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {topInfluencers && topInfluencers.length > 0 ? (
+              <div className='space-y-2'>
+                {topInfluencers.slice(0, 6).map((inf) => {
+                  const score = inf.complianceScore ?? 50;
+                  const risk = score < 40 ? 'High' : score < 70 ? 'Medium' : 'Low';
+                  const riskVariant =
+                    risk === 'High'
+                      ? 'destructive'
+                      : risk === 'Medium'
+                        ? ('secondary' as const)
+                        : ('default' as const);
+                  return (
+                    <div
+                      key={inf._id}
+                      className='flex items-center justify-between rounded-lg px-3 py-2 hover:bg-muted/30'
+                    >
+                      <div>
+                        <p className='text-sm font-medium'>{inf.name}</p>
+                        <p className='text-xs text-muted-foreground'>Score: {score}/100</p>
+                      </div>
+                      <Badge
+                        variant={riskVariant}
+                        className={
+                          risk === 'Medium'
+                            ? 'bg-warning/10 text-warning'
+                            : risk === 'Low'
+                              ? 'bg-success/10 text-success'
+                              : undefined
+                        }
+                      >
+                        {risk} Risk
+                      </Badge>
                     </div>
-                    <span className={`text-xs font-semibold ${riskColor}`}>{risk} Risk</span>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className='flex h-40 items-center justify-center text-sm text-muted-foreground'>
-              No data for risk assessment.
-            </div>
-          )}
-        </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className='flex h-40 items-center justify-center text-sm text-muted-foreground'>
+                No data for risk assessment.
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
