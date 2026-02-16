@@ -10,6 +10,7 @@ import type { Id } from '~convex/_generated/dataModel';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -88,8 +89,12 @@ export default function InfluencersPage() {
   const deleteInfluencer = useMutation(api.influencers.deleteInfluencer);
 
   const [search, setSearch] = useState('');
-  const [filterPlatform, setFilterPlatform] = useState<string>('');
-  const [filterStatus, setFilterStatus] = useState<string>('');
+  const [filterPlatform, setFilterPlatform] = useState<(typeof PLATFORMS)[number] | 'all'>(
+    'all',
+  );
+  const [filterStatus, setFilterStatus] = useState<(typeof COMPLIANCE_STATUSES)[number] | 'all'>(
+    'all',
+  );
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -128,10 +133,10 @@ export default function InfluencersPage() {
       (i) => i.name.toLowerCase().includes(q) || i.handle.toLowerCase().includes(q),
     );
   }
-  if (filterPlatform) {
+  if (filterPlatform !== 'all') {
     filtered = filtered.filter((i) => i.platform === filterPlatform);
   }
-  if (filterStatus) {
+  if (filterStatus !== 'all') {
     filtered = filtered.filter((i) => i.complianceStatus === filterStatus);
   }
 
@@ -199,44 +204,57 @@ export default function InfluencersPage() {
 
       {/* Filters */}
       <div className='flex flex-wrap gap-3'>
-        <div className='relative min-w-50 flex-1'>
-          <HugeiconsIcon
-            icon={Search01Icon}
-            size={14}
-            className='absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground'
-          />
-          <input
+        <InputGroup className='min-w-50 flex-1 bg-card'>
+          <InputGroupAddon align='inline-start'>
+            <HugeiconsIcon icon={Search01Icon} size={14} className='text-muted-foreground' />
+          </InputGroupAddon>
+          <InputGroupInput
             type='text'
             placeholder='Search by name or handle...'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className='w-full rounded-lg border border-border bg-card py-2 pr-4 pl-9 text-sm transition-colors placeholder:text-muted-foreground/50 focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none'
           />
-        </div>
-        <select
+        </InputGroup>
+        <Select
           value={filterPlatform}
-          onChange={(e) => setFilterPlatform(e.target.value)}
-          className='rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground'
+          onValueChange={(value) => {
+            if (value) {
+              setFilterPlatform(value as (typeof PLATFORMS)[number] | 'all');
+            }
+          }}
         >
-          <option value=''>All Platforms</option>
-          {PLATFORMS.map((p) => (
-            <option key={p} value={p} className='capitalize'>
-              {p.charAt(0).toUpperCase() + p.slice(1)}
-            </option>
-          ))}
-        </select>
-        <select
+          <SelectTrigger className='min-w-[160px] bg-card'>
+            <SelectValue placeholder='All Platforms' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='all'>All Platforms</SelectItem>
+            {PLATFORMS.map((p) => (
+              <SelectItem key={p} value={p}>
+                {p.charAt(0).toUpperCase() + p.slice(1)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
           value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className='rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground'
+          onValueChange={(value) => {
+            if (value) {
+              setFilterStatus(value as (typeof COMPLIANCE_STATUSES)[number] | 'all');
+            }
+          }}
         >
-          <option value=''>All Statuses</option>
-          {COMPLIANCE_STATUSES.map((s) => (
-            <option key={s} value={s} className='capitalize'>
-              {s.replace('-', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className='min-w-[160px] bg-card'>
+            <SelectValue placeholder='All Statuses' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='all'>All Statuses</SelectItem>
+            {COMPLIANCE_STATUSES.map((s) => (
+              <SelectItem key={s} value={s}>
+                {s.replace('-', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Data table */}
@@ -326,13 +344,14 @@ export default function InfluencersPage() {
 
       {/* Add Influencer Sheet */}
       <Sheet open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <SheetContent className='w-full overflow-y-auto sm:max-w-md'>
-          <SheetHeader className='mb-6'>
-            <SheetTitle className='font-heading text-xl font-bold'>Add New Influencer</SheetTitle>
-            <SheetDescription>Register a new influencer in the system.</SheetDescription>
-          </SheetHeader>
+        <SheetContent className='w-full overflow-y-auto p-0 sm:max-w-md'>
+          <div className='px-6 pb-6 pt-6'>
+            <SheetHeader className='mb-6 p-0'>
+              <SheetTitle className='font-heading text-xl font-bold'>Add New Influencer</SheetTitle>
+              <SheetDescription>Register a new influencer in the system.</SheetDescription>
+            </SheetHeader>
 
-          <form onSubmit={handleCreate} className='space-y-6'>
+            <form onSubmit={handleCreate} className='space-y-6'>
             <div className='space-y-4'>
               <div className='grid gap-2'>
                 <Label
@@ -488,19 +507,20 @@ export default function InfluencersPage() {
               </div>
             </div>
 
-            <div className='flex justify-end gap-3 border-t border-border pt-4'>
-              <Button type='button' variant='outline' onClick={() => setShowAddDialog(false)}>
-                Cancel
-              </Button>
-              <Button
-                type='submit'
-                disabled={isCreating}
-                className='bg-primary text-primary-foreground hover:bg-primary/90'
-              >
-                {isCreating ? 'Adding...' : 'Add Influencer'}
-              </Button>
-            </div>
-          </form>
+              <div className='flex justify-end gap-3 border-t border-border pt-4'>
+                <Button type='button' variant='outline' onClick={() => setShowAddDialog(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  type='submit'
+                  disabled={isCreating}
+                  className='bg-primary text-primary-foreground hover:bg-primary/90'
+                >
+                  {isCreating ? 'Adding...' : 'Add Influencer'}
+                </Button>
+              </div>
+            </form>
+          </div>
         </SheetContent>
       </Sheet>
     </div>
