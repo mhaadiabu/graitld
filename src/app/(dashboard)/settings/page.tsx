@@ -16,16 +16,16 @@ import { api } from '~convex/_generated/api';
 import { useTheme } from '@/components/theme-provider';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // ── Settings Page ────────────────────────────────────────────────────
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const recentLogs = useQuery(api.auditLogs.getRecentLogs, { limit: 15 });
-  const [activeTab, setActiveTab] = useState<'profile' | 'appearance' | 'activity' | 'about'>(
-    'profile',
-  );
 
   const tabs = [
     { id: 'profile' as const, label: 'Profile', icon: UserCircleIcon },
@@ -35,33 +35,29 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className='space-y-6'>
-      {/* Tab Navigation */}
-      <div className='flex gap-1 rounded-lg border border-border/60 bg-muted/30 p-1'>
+    <Tabs defaultValue='profile' className='space-y-6'>
+      <TabsList className='w-full justify-between sm:w-fit sm:justify-start'>
         {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-              activeTab === tab.id
-                ? 'bg-card text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
+          <TabsTrigger key={tab.id} value={tab.id} className='gap-2 px-4'>
             <HugeiconsIcon icon={tab.icon} size={16} />
             <span className='hidden sm:inline'>{tab.label}</span>
-          </button>
+          </TabsTrigger>
         ))}
-      </div>
+      </TabsList>
 
-      {/* Tab Content */}
-      <div className='animate-page-enter'>
-        {activeTab === 'profile' && <ProfileSection />}
-        {activeTab === 'appearance' && <AppearanceSection theme={theme} setTheme={setTheme} />}
-        {activeTab === 'activity' && <ActivitySection logs={recentLogs} />}
-        {activeTab === 'about' && <AboutSection />}
-      </div>
-    </div>
+      <TabsContent value='profile' className='animate-page-enter'>
+        <ProfileSection />
+      </TabsContent>
+      <TabsContent value='appearance' className='animate-page-enter'>
+        <AppearanceSection theme={theme} setTheme={setTheme} />
+      </TabsContent>
+      <TabsContent value='activity' className='animate-page-enter'>
+        <ActivitySection logs={recentLogs} />
+      </TabsContent>
+      <TabsContent value='about' className='animate-page-enter'>
+        <AboutSection />
+      </TabsContent>
+    </Tabs>
   );
 }
 
@@ -74,7 +70,7 @@ function ProfileSection() {
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSaving(true);
     // Simulated save
@@ -99,7 +95,7 @@ function ProfileSection() {
             <div className='flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent/20 to-gold/20 font-heading text-lg font-bold text-accent'>
               {name
                 .split(' ')
-                .map((n) => n[0])
+                .map((n: string) => n[0])
                 .join('')}
             </div>
             <div>
@@ -118,53 +114,53 @@ function ProfileSection() {
           {/* Form Fields */}
           <div className='grid gap-5 sm:grid-cols-2'>
             <div className='space-y-1.5'>
-              <label className='text-xs font-medium tracking-wider text-muted-foreground uppercase'>
+              <Label className='text-xs font-medium tracking-wider text-muted-foreground uppercase'>
                 Full Name
-              </label>
-              <input
+              </Label>
+              <Input
                 type='text'
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className='w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none'
+                className='bg-background'
               />
             </div>
             <div className='space-y-1.5'>
-              <label className='text-xs font-medium tracking-wider text-muted-foreground uppercase'>
+              <Label className='text-xs font-medium tracking-wider text-muted-foreground uppercase'>
                 Email Address
-              </label>
-              <input
+              </Label>
+              <Input
                 type='email'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className='w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none'
+                className='bg-background'
               />
             </div>
           </div>
 
           <div className='grid gap-5 sm:grid-cols-2'>
             <div className='space-y-1.5'>
-              <label className='text-xs font-medium tracking-wider text-muted-foreground uppercase'>
+              <Label className='text-xs font-medium tracking-wider text-muted-foreground uppercase'>
                 Role
-              </label>
-              <input
+              </Label>
+              <Input
                 type='text'
                 value='Tax Officer'
                 disabled
-                className='w-full rounded-lg border border-input bg-muted/40 px-3 py-2.5 text-sm text-muted-foreground'
+                className='bg-muted/40'
               />
               <p className='text-[11px] text-muted-foreground'>
                 Contact an administrator to change your role.
               </p>
             </div>
             <div className='space-y-1.5'>
-              <label className='text-xs font-medium tracking-wider text-muted-foreground uppercase'>
+              <Label className='text-xs font-medium tracking-wider text-muted-foreground uppercase'>
                 Department
-              </label>
-              <input
+              </Label>
+              <Input
                 type='text'
                 value='Influencer Tax Division'
                 disabled
-                className='w-full rounded-lg border border-input bg-muted/40 px-3 py-2.5 text-sm text-muted-foreground'
+                className='bg-muted/40'
               />
             </div>
           </div>
