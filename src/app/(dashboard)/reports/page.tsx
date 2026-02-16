@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { api } from '~convex/_generated/api';
 
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
 type ReportType = 'tax-summary' | 'compliance-overview' | 'influencer-list' | 'revenue-analysis';
@@ -145,11 +146,11 @@ By Platform:
 
       <div className='grid gap-4 sm:grid-cols-2'>
         {REPORT_TYPES.map((report) => (
-          <div
+          <Card
             key={report.value}
-            className='group rounded-xl border border-border/60 bg-card p-5 transition-all hover:border-accent/30 hover:shadow-md'
+            className='group transition-all hover:border-accent/30 hover:shadow-md'
           >
-            <div className='flex items-start gap-4'>
+            <CardContent className='flex items-start gap-4'>
               <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-accent/10 group-hover:text-accent'>
                 <HugeiconsIcon icon={File01Icon} size={20} />
               </div>
@@ -167,20 +168,24 @@ By Platform:
                   Generate &amp; Download
                 </Button>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
       {/* Recently generated placeholder */}
-      <div className='rounded-xl border border-border/60 bg-card p-5'>
-        <h3 className='mb-4 font-heading text-sm font-semibold tracking-wider text-muted-foreground uppercase'>
-          Report History
-        </h3>
-        <p className='py-8 text-center text-sm text-muted-foreground'>
-          Generated reports will appear here. Reports are downloaded directly to your device.
-        </p>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className='font-heading text-sm font-semibold tracking-wider text-muted-foreground uppercase'>
+            Report History
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className='py-8 text-center text-sm text-muted-foreground'>
+            Generated reports will appear here. Reports are downloaded directly to your device.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }
