@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react';
 import { CommandSearch } from '@/components/command-search';
 import { useTheme } from '@/components/theme-provider';
 import { Button } from '@/components/ui/button';
+import { Kbd } from '@/components/ui/kbd';
+import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 
 const pageTitles: Record<string, { title: string; description: string }> = {
@@ -75,26 +77,29 @@ export function DashboardHeader() {
         </div>
 
         <div className='flex items-center gap-3'>
-          <button
+          <Button
             onClick={() => setSearchOpen(true)}
-            className='group flex h-9 w-full items-center gap-2 rounded-lg border border-input bg-background/50 px-3 text-sm text-muted-foreground transition-colors hover:border-accent/50 hover:bg-accent/5 hover:text-accent-foreground md:w-64'
+            variant='outline'
+            className='group h-9 w-full justify-start gap-2 px-3 text-sm text-muted-foreground md:w-64'
           >
             <HugeiconsIcon icon={Search01Icon} size={16} />
             <span className='hidden sm:inline'>Search...</span>
-            <kbd className='pointer-events-none ml-auto hidden h-5 items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 select-none sm:flex'>
+            <Kbd className='ml-auto hidden sm:inline-flex'>
               <span className='text-xs'>⌘</span>K
-            </kbd>
-          </button>
+            </Kbd>
+          </Button>
 
-          <div className='mx-1 h-6 w-px bg-border/60' />
+          <Separator orientation='vertical' className='mx-1 h-6' />
 
-          <button
+          <Button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className='flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent/10 hover:text-accent-foreground'
+            variant='ghost'
+            size='icon'
+            className='h-9 w-9'
             title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           >
             <HugeiconsIcon icon={theme === 'dark' ? Sun01Icon : Moon02Icon} size={18} />
-          </button>
+          </Button>
         </div>
       </header>
 
