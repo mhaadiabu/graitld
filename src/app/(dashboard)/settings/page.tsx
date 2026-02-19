@@ -2,22 +2,15 @@
 
 import {
   Clock01Icon,
-  InformationCircleIcon,
   Moon02Icon,
   Settings01Icon,
   Sun01Icon,
-  UserCircleIcon,
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useQuery } from 'convex/react';
-import { useState } from 'react';
 import { api } from '~convex/_generated/api';
 
 import { useTheme } from '@/components/theme-provider';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -34,14 +27,12 @@ export default function SettingsPage() {
   const recentLogs = useQuery(api.auditLogs.getRecentLogs, { limit: 15 });
 
   const tabs = [
-    { id: 'profile' as const, label: 'Profile', icon: UserCircleIcon },
     { id: 'appearance' as const, label: 'Appearance', icon: Sun01Icon },
     { id: 'activity' as const, label: 'Activity Log', icon: Clock01Icon },
-    { id: 'about' as const, label: 'About', icon: InformationCircleIcon },
   ];
 
   return (
-    <Tabs defaultValue='profile' className='space-y-6'>
+    <Tabs defaultValue='appearance' className='space-y-6'>
       <TabsList className='w-full justify-between sm:w-fit sm:justify-start'>
         {tabs.map((tab) => (
           <TabsTrigger key={tab.id} value={tab.id} className='gap-2 px-4'>
@@ -51,17 +42,11 @@ export default function SettingsPage() {
         ))}
       </TabsList>
 
-      <TabsContent value='profile' className='animate-page-enter'>
-        <ProfileSection />
-      </TabsContent>
-      <TabsContent value='appearance' className='animate-page-enter'>
+      <TabsContent value='appearance'>
         <AppearanceSection theme={theme} setTheme={setTheme} />
       </TabsContent>
-      <TabsContent value='activity' className='animate-page-enter'>
+      <TabsContent value='activity'>
         <ActivitySection logs={recentLogs} />
-      </TabsContent>
-      <TabsContent value='about' className='animate-page-enter'>
-        <AboutSection />
       </TabsContent>
     </Tabs>
   );
@@ -246,22 +231,22 @@ function AppearanceSection({
       id: 'light' as const,
       label: 'Light',
       icon: Sun01Icon,
-      description: 'Warm ivory surfaces with deep navy text',
-      preview: 'bg-[oklch(0.975_0.005_85)]',
+      description: 'High-contrast light interface',
+      preview: 'bg-[oklch(0.985_0.002_240)]',
     },
     {
       id: 'dark' as const,
       label: 'Dark',
       icon: Moon02Icon,
-      description: 'Rich navy-black with cream text and gold accents',
-      preview: 'bg-[oklch(0.14_0.02_250)]',
+      description: 'High-contrast dark interface',
+      preview: 'bg-[oklch(0.12_0.04_265)]',
     },
     {
       id: 'system' as const,
       label: 'System',
       icon: Settings01Icon,
-      description: 'Follows your operating system preference',
-      preview: 'bg-gradient-to-r from-[oklch(0.975_0.005_85)] to-[oklch(0.14_0.02_250)]',
+      description: 'Follow operating system preference',
+      preview: 'bg-gradient-to-r from-[oklch(0.985_0.002_240)] to-[oklch(0.12_0.04_265)]',
     },
   ];
 
@@ -269,7 +254,7 @@ function AppearanceSection({
     <div className='rounded-xl border border-border/60 bg-card p-6'>
       <h2 className='font-heading text-base font-semibold'>Appearance</h2>
       <p className='mt-1 text-sm text-muted-foreground'>
-        Customize how the dashboard looks on your device.
+        Choose how the dashboard theme is applied across pages.
       </p>
 
       <div className='mt-6 grid gap-4 sm:grid-cols-3'>
@@ -283,9 +268,7 @@ function AppearanceSection({
                 : 'border-border/60 hover:border-border'
             }`}
           >
-            {/* Preview swatch */}
             <div className={`mb-3 h-20 rounded-lg border border-border/40 ${t.preview}`}>
-              {/* Mini UI preview */}
               <div className='flex h-full items-center justify-center'>
                 <HugeiconsIcon
                   icon={t.icon}
@@ -294,7 +277,6 @@ function AppearanceSection({
                 />
               </div>
             </div>
-
             <div className='flex items-center gap-2'>
               <p className='text-sm font-medium'>{t.label}</p>
               {theme === t.id && (
@@ -307,45 +289,15 @@ function AppearanceSection({
           </button>
         ))}
       </div>
-
-      {/* Additional Appearance Options */}
-      <div className='mt-6 space-y-4 border-t border-border/60 pt-6'>
-        <h3 className='text-sm font-semibold'>Display Options</h3>
-
-        <div className='flex items-center justify-between rounded-lg border border-border/40 bg-background/50 p-4'>
-          <div>
-            <p className='text-sm font-medium'>Compact Mode</p>
-            <p className='text-xs text-muted-foreground'>
-              Reduce spacing and padding for denser information display.
-            </p>
-          </div>
-          <ToggleSwitch defaultChecked={false} disabled />
-        </div>
-
-        <div className='flex items-center justify-between rounded-lg border border-border/40 bg-background/50 p-4'>
-          <div>
-            <p className='text-sm font-medium'>Animations</p>
-            <p className='text-xs text-muted-foreground'>
-              Page transitions and micro-interactions.
-            </p>
-          </div>
-          <ToggleSwitch defaultChecked={true} disabled />
-        </div>
-      </div>
     </div>
   );
 }
 
-// ── Activity Log Section ─────────────────────────────────────────────
-
 type AuditLog = {
   _id: string;
-  _creationTime: number;
   action: string;
   entityType: string;
-  entityId?: string;
   userName?: string;
-  userId?: string;
   details?: string;
   timestamp: number;
 };
@@ -387,10 +339,7 @@ function ActivitySection({ logs }: { logs: AuditLog[] | undefined }) {
           <div className='flex h-12 w-12 items-center justify-center rounded-full bg-muted/60'>
             <HugeiconsIcon icon={Clock01Icon} size={20} className='text-muted-foreground' />
           </div>
-          <p className='mt-3 text-sm text-muted-foreground'>
-            No activity recorded yet. Actions like creating or updating influencer records will
-            appear here.
-          </p>
+          <p className='mt-3 text-sm text-muted-foreground'>No activity recorded yet.</p>
         </div>
       ) : (
         <div className='mt-6 space-y-1'>
@@ -400,24 +349,24 @@ function ActivitySection({ logs }: { logs: AuditLog[] | undefined }) {
               className='flex items-start gap-3 rounded-lg p-3 transition-colors hover:bg-muted/20'
             >
               <div className='mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted/60'>
-                <ActionIcon action={log.action} />
+                <HugeiconsIcon icon={Clock01Icon} size={12} className='text-muted-foreground' />
               </div>
               <div className='flex-1'>
                 <p className='text-sm'>
                   <span className='font-medium'>{log.userName ?? 'System'}</span>{' '}
-                  <span className='text-muted-foreground'>{formatAction(log.action)}</span>
+                  <span className='text-muted-foreground'>
+                    {log.action.replace(/_/g, ' ').toLowerCase()}
+                  </span>
                   {log.entityType && (
                     <span className='ml-1 rounded bg-muted/60 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground'>
                       {log.entityType}
                     </span>
                   )}
                 </p>
-                {log.details && (
-                  <p className='mt-0.5 text-xs text-muted-foreground'>{log.details}</p>
-                )}
+                {log.details && <p className='mt-0.5 text-xs text-muted-foreground'>{log.details}</p>}
               </div>
               <span className='shrink-0 text-[11px] text-muted-foreground'>
-                {formatTimestamp(log.timestamp)}
+                {new Date(log.timestamp).toLocaleString()}
               </span>
             </div>
           ))}
