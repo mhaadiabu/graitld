@@ -14,8 +14,6 @@ import type { Route } from 'next';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
-import { authClient } from '@/lib/auth-client';
-
 import {
   Sidebar,
   SidebarContent,
@@ -71,11 +69,9 @@ export const AppSidebar = () => {
   const router = useRouter();
 
   const handleSignOut = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => router.push('/sign-in'),
-      },
-    });
+    await fetch('/api/logout', { method: 'POST' });
+    router.push('/sign-in');
+    router.refresh();
   };
 
   const isActive = (href: string) => {
