@@ -111,9 +111,7 @@ export default function InfluencersPage() {
   const deleteInfluencer = useMutation(api.influencers.deleteInfluencer);
 
   const [search, setSearch] = useState('');
-  const [filterPlatform, setFilterPlatform] = useState<(typeof PLATFORMS)[number] | 'all'>(
-    'all',
-  );
+  const [filterPlatform, setFilterPlatform] = useState<(typeof PLATFORMS)[number] | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<(typeof COMPLIANCE_STATUSES)[number] | 'all'>(
     'all',
   );
@@ -367,167 +365,169 @@ export default function InfluencersPage() {
       {/* Add Influencer Sheet */}
       <Sheet open={showAddDialog} onOpenChange={setShowAddDialog}>
         <SheetContent className='w-full overflow-y-auto p-0 sm:max-w-md'>
-          <div className='px-6 pb-6 pt-6'>
+          <div className='px-6 pt-6 pb-6'>
             <SheetHeader className='mb-6 p-0'>
               <SheetTitle className='font-heading text-xl font-bold'>Add New Influencer</SheetTitle>
               <SheetDescription>Register a new influencer in the system.</SheetDescription>
             </SheetHeader>
 
             <form onSubmit={handleCreate} className='space-y-6'>
-            <div className='space-y-4'>
-              <div className='grid gap-2'>
-                <Label
-                  htmlFor='name'
-                  className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
-                >
-                  Full Name *
-                </Label>
-                <Input
-                  id='name'
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  required
-                  placeholder='e.g. Kwame Asante'
-                  className='bg-secondary/20'
-                />
-              </div>
-
-              <div className='grid gap-2'>
-                <Label
-                  htmlFor='handle'
-                  className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
-                >
-                  Handle *
-                </Label>
-                <Input
-                  id='handle'
-                  value={form.handle}
-                  onChange={(e) => setForm({ ...form, handle: e.target.value })}
-                  required
-                  placeholder='@channel_name'
-                  className='bg-secondary/20'
-                />
-              </div>
-
-              <div className='grid grid-cols-2 gap-4'>
+              <div className='space-y-4'>
                 <div className='grid gap-2'>
                   <Label
-                    htmlFor='platform'
+                    htmlFor='name'
                     className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
                   >
-                    Platform *
-                  </Label>
-                  <Select
-                    value={form.platform}
-                    onValueChange={(value) =>
-                      setForm({ ...form, platform: value as 'youtube' | 'tiktok' })
-                    }
-                  >
-                    <SelectTrigger id='platform' className='bg-secondary/20'>
-                      <SelectValue placeholder='Select platform' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='youtube'>YouTube</SelectItem>
-                      <SelectItem value='tiktok'>TikTok</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className='grid gap-2'>
-                  <Label
-                    htmlFor='region'
-                    className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
-                  >
-                    Region
-                  </Label>
-                  <Select
-                    value={form.region}
-                    onValueChange={(value) =>
-                      setForm({ ...form, region: value as (typeof REGIONS)[number] })
-                    }
-                  >
-                    <SelectTrigger id='region' className='bg-secondary/20'>
-                      <SelectValue placeholder='Select region' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {REGIONS.map((r) => (
-                        <SelectItem key={r} value={r}>
-                          {r}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className='grid gap-2'>
-                <Label
-                  htmlFor='email'
-                  className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
-                >
-                  Email
-                </Label>
-                <Input
-                  id='email'
-                  type='email'
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder='email@example.com'
-                  className='bg-secondary/20'
-                />
-              </div>
-
-              <div className='grid gap-2'>
-                <Label
-                  htmlFor='taxId'
-                  className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
-                >
-                  Tax ID Number
-                </Label>
-                <Input
-                  id='taxId'
-                  value={form.taxIdNumber}
-                  onChange={(e) => setForm({ ...form, taxIdNumber: e.target.value })}
-                  placeholder='GHA-XXXXX'
-                  className='bg-secondary/20'
-                />
-              </div>
-
-              <div className='grid grid-cols-2 gap-4'>
-                <div className='grid gap-2'>
-                  <Label
-                    htmlFor='monthlyRev'
-                    className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
-                  >
-                    Est. Monthly (GH&#8373;)
+                    Full Name *
                   </Label>
                   <Input
-                    id='monthlyRev'
-                    type='number'
-                    value={form.estimatedMonthlyRevenue}
-                    onChange={(e) => setForm({ ...form, estimatedMonthlyRevenue: e.target.value })}
-                    placeholder='0'
+                    id='name'
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    required
+                    placeholder='e.g. Kwame Asante'
                     className='bg-secondary/20'
                   />
                 </div>
+
                 <div className='grid gap-2'>
                   <Label
-                    htmlFor='annualRev'
+                    htmlFor='handle'
                     className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
                   >
-                    Est. Annual (GH&#8373;)
+                    Handle *
                   </Label>
                   <Input
-                    id='annualRev'
-                    type='number'
-                    value={form.estimatedAnnualRevenue}
-                    onChange={(e) => setForm({ ...form, estimatedAnnualRevenue: e.target.value })}
-                    placeholder='Auto'
+                    id='handle'
+                    value={form.handle}
+                    onChange={(e) => setForm({ ...form, handle: e.target.value })}
+                    required
+                    placeholder='@channel_name'
                     className='bg-secondary/20'
                   />
                 </div>
+
+                <div className='grid grid-cols-2 gap-4'>
+                  <div className='grid gap-2'>
+                    <Label
+                      htmlFor='platform'
+                      className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
+                    >
+                      Platform *
+                    </Label>
+                    <Select
+                      value={form.platform}
+                      onValueChange={(value) =>
+                        setForm({ ...form, platform: value as 'youtube' | 'tiktok' })
+                      }
+                    >
+                      <SelectTrigger id='platform' className='bg-secondary/20'>
+                        <SelectValue placeholder='Select platform' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value='youtube'>YouTube</SelectItem>
+                        <SelectItem value='tiktok'>TikTok</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className='grid gap-2'>
+                    <Label
+                      htmlFor='region'
+                      className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
+                    >
+                      Region
+                    </Label>
+                    <Select
+                      value={form.region}
+                      onValueChange={(value) =>
+                        setForm({ ...form, region: value as (typeof REGIONS)[number] })
+                      }
+                    >
+                      <SelectTrigger id='region' className='bg-secondary/20'>
+                        <SelectValue placeholder='Select region' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {REGIONS.map((r) => (
+                          <SelectItem key={r} value={r}>
+                            {r}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className='grid gap-2'>
+                  <Label
+                    htmlFor='email'
+                    className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
+                  >
+                    Email
+                  </Label>
+                  <Input
+                    id='email'
+                    type='email'
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder='email@example.com'
+                    className='bg-secondary/20'
+                  />
+                </div>
+
+                <div className='grid gap-2'>
+                  <Label
+                    htmlFor='taxId'
+                    className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
+                  >
+                    Tax ID Number
+                  </Label>
+                  <Input
+                    id='taxId'
+                    value={form.taxIdNumber}
+                    onChange={(e) => setForm({ ...form, taxIdNumber: e.target.value })}
+                    placeholder='GHA-XXXXX'
+                    className='bg-secondary/20'
+                  />
+                </div>
+
+                <div className='grid grid-cols-2 gap-4'>
+                  <div className='grid gap-2'>
+                    <Label
+                      htmlFor='monthlyRev'
+                      className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
+                    >
+                      Est. Monthly (GH&#8373;)
+                    </Label>
+                    <Input
+                      id='monthlyRev'
+                      type='number'
+                      value={form.estimatedMonthlyRevenue}
+                      onChange={(e) =>
+                        setForm({ ...form, estimatedMonthlyRevenue: e.target.value })
+                      }
+                      placeholder='0'
+                      className='bg-secondary/20'
+                    />
+                  </div>
+                  <div className='grid gap-2'>
+                    <Label
+                      htmlFor='annualRev'
+                      className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
+                    >
+                      Est. Annual (GH&#8373;)
+                    </Label>
+                    <Input
+                      id='annualRev'
+                      type='number'
+                      value={form.estimatedAnnualRevenue}
+                      onChange={(e) => setForm({ ...form, estimatedAnnualRevenue: e.target.value })}
+                      placeholder='Auto'
+                      className='bg-secondary/20'
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
 
               <div className='flex justify-end gap-3 border-t border-border pt-4'>
                 <Button type='button' variant='outline' onClick={() => setShowAddDialog(false)}>

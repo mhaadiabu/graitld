@@ -163,77 +163,78 @@ export default function OverviewPage() {
             </div>
           </CardHeader>
 
-          <CardContent className='px-6 pb-6'>{revenueData && revenueData.length > 0 ? (
-            <div className='h-[300px] w-full'>
-              <ResponsiveContainer width='100%' height='100%'>
-                <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id='gradRevenue' x1='0' y1='0' x2='0' y2='1'>
-                      <stop offset='5%' stopColor='var(--chart-1)' stopOpacity={0.3} />
-                      <stop offset='95%' stopColor='var(--chart-1)' stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id='gradTax' x1='0' y1='0' x2='0' y2='1'>
-                      <stop offset='5%' stopColor='var(--chart-2)' stopOpacity={0.3} />
-                      <stop offset='95%' stopColor='var(--chart-2)' stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid
-                    strokeDasharray='3 3'
-                    stroke='var(--border)'
-                    opacity={0.4}
-                    vertical={false}
-                  />
-                  <XAxis
-                    dataKey='month'
-                    tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-                    axisLine={false}
-                    tickLine={false}
-                    dy={10}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickFormatter={(v) => formatCurrency(v)}
-                    dx={-10}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'var(--popover)',
-                      border: '1px solid var(--border)',
-                      borderRadius: '12px',
-                      fontSize: '12px',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    }}
-                    itemStyle={{ color: 'var(--foreground)' }}
-                    formatter={(value: any) => formatCurrency(Number(value))}
-                  />
-                  <Area
-                    type='monotone'
-                    dataKey='revenue'
-                    name='Est. Revenue'
-                    stroke='var(--chart-1)'
-                    strokeWidth={3}
-                    fill='url(#gradRevenue)'
-                    activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--chart-1)' }}
-                  />
-                  <Area
-                    type='monotone'
-                    dataKey='tax'
-                    name='Est. Tax'
-                    stroke='var(--chart-2)'
-                    strokeWidth={3}
-                    fill='url(#gradTax)'
-                    activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--chart-2)' }}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className='flex h-64 items-center justify-center text-sm text-muted-foreground'>
-              No data yet. Add influencers to see trends.
-            </div>
-          )}
+          <CardContent className='px-6 pb-6'>
+            {revenueData && revenueData.length > 0 ? (
+              <div className='h-[300px] w-full'>
+                <ResponsiveContainer width='100%' height='100%'>
+                  <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id='gradRevenue' x1='0' y1='0' x2='0' y2='1'>
+                        <stop offset='5%' stopColor='var(--chart-1)' stopOpacity={0.3} />
+                        <stop offset='95%' stopColor='var(--chart-1)' stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id='gradTax' x1='0' y1='0' x2='0' y2='1'>
+                        <stop offset='5%' stopColor='var(--chart-2)' stopOpacity={0.3} />
+                        <stop offset='95%' stopColor='var(--chart-2)' stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid
+                      strokeDasharray='3 3'
+                      stroke='var(--border)'
+                      opacity={0.4}
+                      vertical={false}
+                    />
+                    <XAxis
+                      dataKey='month'
+                      tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
+                      axisLine={false}
+                      tickLine={false}
+                      dy={10}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
+                      axisLine={false}
+                      tickLine={false}
+                      tickFormatter={(v) => formatCurrency(v)}
+                      dx={-10}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'var(--popover)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '12px',
+                        fontSize: '12px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                      }}
+                      itemStyle={{ color: 'var(--foreground)' }}
+                      formatter={(value: any) => formatCurrency(Number(value))}
+                    />
+                    <Area
+                      type='monotone'
+                      dataKey='revenue'
+                      name='Est. Revenue'
+                      stroke='var(--chart-1)'
+                      strokeWidth={3}
+                      fill='url(#gradRevenue)'
+                      activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--chart-1)' }}
+                    />
+                    <Area
+                      type='monotone'
+                      dataKey='tax'
+                      name='Est. Tax'
+                      stroke='var(--chart-2)'
+                      strokeWidth={3}
+                      fill='url(#gradTax)'
+                      activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--chart-2)' }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className='flex h-64 items-center justify-center text-sm text-muted-foreground'>
+                No data yet. Add influencers to see trends.
+              </div>
+            )}
           </CardContent>
         </Card>
         {/* Platform distribution */}
@@ -244,64 +245,64 @@ export default function OverviewPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className='px-6 pb-6'>
-          {platformData && (platformData[0].value > 0 || platformData[1].value > 0) ? (
-            <div className='flex h-[300px] flex-col items-center justify-center'>
-              <ResponsiveContainer width='100%' height={220}>
-                <PieChart>
-                  <Pie
-                    data={platformData}
-                    cx='50%'
-                    cy='50%'
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={6}
-                    dataKey='value'
-                    strokeWidth={0}
-                    cornerRadius={6}
-                  >
-                    {platformData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={index === 0 ? 'var(--chart-4)' : 'var(--chart-5)'}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'var(--popover)',
-                      border: '1px solid var(--border)',
-                      borderRadius: '8px',
-                      fontSize: '12px',
-                    }}
-                    itemStyle={{ color: 'var(--foreground)' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className='mt-4 grid w-full grid-cols-2 gap-4 px-4'>
-                {platformData.map((p, i) => (
-                  <div
-                    key={p.name}
-                    className='flex flex-col items-center rounded-lg bg-secondary/50 p-2'
-                  >
-                    <span className='text-xs font-medium text-muted-foreground uppercase'>
-                      {p.name}
-                    </span>
-                    <div className='mt-1 flex items-center gap-2'>
-                      <span
-                        className='h-2 w-2 rounded-full'
-                        style={{ backgroundColor: i === 0 ? 'var(--chart-4)' : 'var(--chart-5)' }}
-                      />
-                      <span className='text-lg font-bold'>{p.value}</span>
+            {platformData && (platformData[0].value > 0 || platformData[1].value > 0) ? (
+              <div className='flex h-[300px] flex-col items-center justify-center'>
+                <ResponsiveContainer width='100%' height={220}>
+                  <PieChart>
+                    <Pie
+                      data={platformData}
+                      cx='50%'
+                      cy='50%'
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={6}
+                      dataKey='value'
+                      strokeWidth={0}
+                      cornerRadius={6}
+                    >
+                      {platformData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={index === 0 ? 'var(--chart-4)' : 'var(--chart-5)'}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'var(--popover)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                      }}
+                      itemStyle={{ color: 'var(--foreground)' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className='mt-4 grid w-full grid-cols-2 gap-4 px-4'>
+                  {platformData.map((p, i) => (
+                    <div
+                      key={p.name}
+                      className='flex flex-col items-center rounded-lg bg-secondary/50 p-2'
+                    >
+                      <span className='text-xs font-medium text-muted-foreground uppercase'>
+                        {p.name}
+                      </span>
+                      <div className='mt-1 flex items-center gap-2'>
+                        <span
+                          className='h-2 w-2 rounded-full'
+                          style={{ backgroundColor: i === 0 ? 'var(--chart-4)' : 'var(--chart-5)' }}
+                        />
+                        <span className='text-lg font-bold'>{p.value}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className='flex h-48 items-center justify-center text-sm text-muted-foreground'>
-              No influencers yet.
-            </div>
-          )}
+            ) : (
+              <div className='flex h-48 items-center justify-center text-sm text-muted-foreground'>
+                No influencers yet.
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

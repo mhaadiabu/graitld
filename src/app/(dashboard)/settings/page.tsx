@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  Clock01Icon,
-  Moon02Icon,
-  Settings01Icon,
-  Sun01Icon,
-} from '@hugeicons/core-free-icons';
+import { Clock01Icon, Moon02Icon, Settings01Icon, Sun01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useQuery } from 'convex/react';
 import { api } from '~convex/_generated/api';
@@ -141,12 +136,7 @@ function ProfileSection() {
               <Label className='text-xs font-medium tracking-wider text-muted-foreground uppercase'>
                 Role
               </Label>
-              <Input
-                type='text'
-                value='Tax Officer'
-                disabled
-                className='bg-muted/40'
-              />
+              <Input type='text' value='Tax Officer' disabled className='bg-muted/40' />
               <p className='text-[11px] text-muted-foreground'>
                 Contact an administrator to change your role.
               </p>
@@ -155,12 +145,7 @@ function ProfileSection() {
               <Label className='text-xs font-medium tracking-wider text-muted-foreground uppercase'>
                 Department
               </Label>
-              <Input
-                type='text'
-                value='Influencer Tax Division'
-                disabled
-                className='bg-muted/40'
-              />
+              <Input type='text' value='Influencer Tax Division' disabled className='bg-muted/40' />
             </div>
           </div>
 
@@ -363,7 +348,9 @@ function ActivitySection({ logs }: { logs: AuditLog[] | undefined }) {
                     </span>
                   )}
                 </p>
-                {log.details && <p className='mt-0.5 text-xs text-muted-foreground'>{log.details}</p>}
+                {log.details && (
+                  <p className='mt-0.5 text-xs text-muted-foreground'>{log.details}</p>
+                )}
               </div>
               <span className='shrink-0 text-[11px] text-muted-foreground'>
                 {new Date(log.timestamp).toLocaleString()}
