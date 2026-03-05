@@ -3,9 +3,9 @@
   "ignorePatterns": [
     "dist/**",
     "*.min.js",
-    "convex/_generated/",
+    "convex/_generated",
     "node_modules/**",
-    "routeTree.gen.ts",
+    ".next",
     "pnpm-lock.yaml",
     "bun.lock",
     "package-lock.json"
@@ -14,20 +14,19 @@
   "singleQuote": true,
   "quoteProps": "consistent",
   "semi": true,
-  "experimentalSortImports": {
+  "sortImports": {
     "groups": [
-      ["side-effect"],
-      ["builtin"],
-      ["external", "type-external"],
-      ["internal", "type-internal"],
-      ["parent", "type-parent"],
-      ["sibling", "type-sibling"],
-      ["index", "type-index"]
+      "type-import",
+      ["value-builtin", "value-external"],
+      "type-internal",
+      "value-internal",
+      ["type-parent", "type-sibling", "type-index"],
+      ["value-parent", "value-sibling", "value-index"],
+      "unknown"
     ]
   },
-  "experimentalTailwindcss": {
+  "sortTailwindcss": {
     "stylesheet": "./src/app/globals.css",
-    "attributes": ["class", "className"],
     "functions": ["clsx", "cn"],
     "preserveWhitespace": true
   }
