@@ -68,7 +68,7 @@ export function DashboardHeader() {
 
   return (
     <>
-      <header className='sticky top-0 z-30 flex h-20 shrink-0 items-center justify-between gap-4 border-b border-border/40 bg-background/80 px-8 backdrop-blur-xl transition-all'>
+      <header className='w-full sticky top-0 z-30 flex py-2.5 shrink-0 items-center justify-between gap-4 border-b border-border/40 bg-background/80 px-4 backdrop-blur-xl transition-all'>
         <div className='flex items-center gap-4'>
           <SidebarTrigger className='-ml-2 h-9 w-9 text-muted-foreground hover:bg-accent hover:text-accent-foreground' />
           <div className='flex flex-col gap-0.5'>
@@ -90,7 +90,7 @@ export function DashboardHeader() {
             className='group h-9 w-full justify-start gap-2 px-3 text-sm text-muted-foreground md:w-64'
           >
             <HugeiconsIcon icon={Search01Icon} size={16} />
-            <span className='hidden sm:inline'>Search...</span>
+            <span>Search...</span>
             <Kbd className='ml-auto hidden sm:inline-flex'>
               <span className='text-xs'>⌘</span>K
             </Kbd>
