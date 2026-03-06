@@ -1,11 +1,11 @@
-import './globals.css';
-
 import type { Metadata } from 'next';
 import { Manrope, DM_Sans, JetBrains_Mono } from 'next/font/google';
 
 import { ThemeProvider } from '@/components/theme-provider';
 
 import { ConvexClientProvider } from './ConvexClientProvider';
+
+import './globals.css';
 
 const manrope = Manrope({
   subsets: ['latin'],
