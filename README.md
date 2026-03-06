@@ -46,15 +46,15 @@ bun run start
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `dev` | Run frontend and backend concurrently |
-| `dev:frontend` | Start Next.js dev server |
-| `dev:backend` | Start Convex dev server |
-| `build` | Build for production |
-| `start` | Start production server |
-| `lint` | Run ESLint |
-| `format` | Format code with oxfmt |
+| Command        | Description                           |
+| -------------- | ------------------------------------- |
+| `dev`          | Run frontend and backend concurrently |
+| `dev:frontend` | Start Next.js dev server              |
+| `dev:backend`  | Start Convex dev server               |
+| `build`        | Build for production                  |
+| `start`        | Start production server               |
+| `lint`         | Run ESLint                            |
+| `format`       | Format code with oxfmt                |
 
 ## Project Structure
 
