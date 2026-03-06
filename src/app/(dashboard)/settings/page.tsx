@@ -5,7 +5,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { useQuery } from 'convex/react';
 import { api } from '~convex/_generated/api';
 
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from 'next-themes';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -47,7 +47,6 @@ export default function SettingsPage() {
   );
 }
 
-
 /**
  * Renders the Appearance settings panel allowing the user to preview and select a theme.
  *
@@ -63,7 +62,7 @@ function AppearanceSection({
   theme,
   setTheme,
 }: {
-  theme: string;
+  theme: string | undefined;
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
 }) {
   const themes = [
