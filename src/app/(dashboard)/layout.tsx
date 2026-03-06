@@ -23,10 +23,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <main className='min-h-screen w-full flex flex-1 flex-col items-center px-4 sm:px-6'>
-          <DashboardHeader />
-          <div className='flex flex-col pt-4 pb-8'>{children}</div>
-        </main>
+        <DashboardHeader />
+        <div className='flex w-full flex-1 flex-col overflow-x-hidden px-4 pt-4 pb-8 sm:px-6'>
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

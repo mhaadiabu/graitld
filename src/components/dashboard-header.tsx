@@ -68,9 +68,9 @@ export function DashboardHeader() {
 
   return (
     <>
-      <header className='w-full sticky top-0 z-30 flex py-2.5 shrink-0 items-center justify-between gap-4 border-b border-border/40 bg-background/80 px-4 backdrop-blur-xl transition-all'>
-        <div className='flex items-center gap-4'>
-          <SidebarTrigger className='-ml-2 h-9 w-9 text-muted-foreground hover:bg-accent hover:text-accent-foreground' />
+      <header className='w-full sticky top-0 z-30 flex py-2.5 shrink-0 items-center justify-between gap-4 border-b border-border/40 bg-background/80 px-4 backdrop-blur-xl transition-all overflow-hidden'>
+        <div className='flex min-w-0 items-center gap-4'>
+          <SidebarTrigger className='-ml-2 h-9 w-9 shrink-0 text-muted-foreground hover:bg-accent hover:text-accent-foreground' />
           <div className='flex flex-col gap-0.5'>
             <h1 className='font-heading text-lg font-bold tracking-tight text-foreground'>
               {page.title}
@@ -83,17 +83,27 @@ export function DashboardHeader() {
           </div>
         </div>
 
-        <div className='flex items-center gap-3'>
+        <div className='flex shrink-0 items-center gap-3'>
           <Button
             onClick={() => setSearchOpen(true)}
             variant='outline'
-            className='group h-9 w-full justify-start gap-2 px-3 text-sm text-muted-foreground md:w-64'
+            className='group hidden h-9 shrink-0 justify-start gap-2 px-3 text-sm text-muted-foreground sm:flex sm:w-48 md:w-64'
           >
             <HugeiconsIcon icon={Search01Icon} size={16} />
             <span>Search...</span>
             <Kbd className='ml-auto hidden sm:inline-flex'>
               <span className='text-xs'>⌘</span>K
             </Kbd>
+          </Button>
+
+          <Button
+            onClick={() => setSearchOpen(true)}
+            variant='ghost'
+            size='icon'
+            className='h-9 w-9 shrink-0 sm:hidden'
+            title='Search'
+          >
+            <HugeiconsIcon icon={Search01Icon} size={18} />
           </Button>
 
           <Separator orientation='vertical' className='mx-1 h-6' />

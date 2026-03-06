@@ -111,7 +111,7 @@ export default function OverviewPage() {
   }
 
   return (
-    <div className='stagger-children animate-page-enter mx-auto max-w-400 space-y-8 p-1'>
+    <div className='stagger-children animate-page-enter mx-auto w-full max-w-400 space-y-8 p-1'>
       {/* Metric cards */}
       <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-4'>
         <MetricCard
