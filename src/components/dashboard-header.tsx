@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { CommandSearch } from '@/components/command-search';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Kbd } from '@/components/ui/kbd';
 import { Separator } from '@/components/ui/separator';
@@ -53,7 +53,7 @@ export function DashboardHeader() {
     description: '',
   };
   const [searchOpen, setSearchOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -99,13 +99,13 @@ export function DashboardHeader() {
           <Separator orientation='vertical' className='mx-1 h-6' />
 
           <Button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
             variant='ghost'
             size='icon'
             className='h-9 w-9'
-            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            title={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
           >
-            <HugeiconsIcon icon={theme === 'dark' ? Sun01Icon : Moon02Icon} size={18} />
+            <HugeiconsIcon icon={resolvedTheme === 'dark' ? Sun01Icon : Moon02Icon} size={18} />
           </Button>
         </div>
       </header>
