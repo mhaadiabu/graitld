@@ -237,46 +237,48 @@ export default function InfluencersPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </InputGroup>
-        <Select
-          value={filterPlatform}
-          onValueChange={(value) => {
-            if (value) {
-              setFilterPlatform(value as (typeof PLATFORMS)[number] | 'all');
-            }
-          }}
-        >
-          <SelectTrigger className='min-w-40 bg-card'>
-            <SelectValue placeholder='All Platforms' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='all'>All Platforms</SelectItem>
-            {PLATFORMS.map((p) => (
-              <SelectItem key={p} value={p}>
-                {p.charAt(0).toUpperCase() + p.slice(1)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
-          value={filterStatus}
-          onValueChange={(value) => {
-            if (value) {
-              setFilterStatus(value as (typeof COMPLIANCE_STATUSES)[number] | 'all');
-            }
-          }}
-        >
-          <SelectTrigger className='min-w-40 bg-card'>
-            <SelectValue placeholder='All Statuses' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='all'>All Statuses</SelectItem>
-            {COMPLIANCE_STATUSES.map((s) => (
-              <SelectItem key={s} value={s}>
-                {s.replace('-', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className='flex w-full items-center justify-between gap-2'>
+          <Select
+            value={filterPlatform}
+            onValueChange={(value) => {
+              if (value) {
+                setFilterPlatform(value as (typeof PLATFORMS)[number] | 'all');
+              }
+            }}
+          >
+            <SelectTrigger className='min-w-40 bg-card'>
+              <SelectValue placeholder='All Platforms' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>All Platforms</SelectItem>
+              {PLATFORMS.map((p) => (
+                <SelectItem key={p} value={p}>
+                  {p.charAt(0).toUpperCase() + p.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={filterStatus}
+            onValueChange={(value) => {
+              if (value) {
+                setFilterStatus(value as (typeof COMPLIANCE_STATUSES)[number] | 'all');
+              }
+            }}
+          >
+            <SelectTrigger className='min-w-40 bg-card'>
+              <SelectValue placeholder='All Statuses' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>All Statuses</SelectItem>
+              {COMPLIANCE_STATUSES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s.replace('-', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Data table */}
