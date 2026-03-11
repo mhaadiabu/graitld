@@ -61,10 +61,6 @@ const influencerFields = {
   region: v.optional(regionValidator),
   country: v.optional(v.string()),
   channelCreatedAt: v.optional(v.number()),
-  source: v.optional(v.union(v.literal('manual'), v.literal('youtube_api'))),
-  sourceLookupValue: v.optional(v.string()),
-  sourceResolvedAt: v.optional(v.number()),
-  sourceRefreshError: v.optional(v.string()),
   notes: v.optional(v.string()),
 };
 
@@ -162,7 +158,7 @@ export const createInfluencer = mutation({
     const influencerId = await ctx.db.insert('influencers', {
       ...args,
       complianceStatus: args.complianceStatus ?? 'pending',
-      source: args.source ?? 'manual',
+      source: 'manual',
       lastDataRefresh: Date.now(),
     });
     return influencerId;
@@ -204,7 +200,6 @@ export const upsertYoutubeInfluencer = mutation({
     topicCategories: v.optional(v.array(v.string())),
     country: v.optional(v.string()),
     channelCreatedAt: v.optional(v.number()),
-    sourceLookupValue: v.string(),
   },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
@@ -215,16 +210,19 @@ export const upsertYoutubeInfluencer = mutation({
       .unique();
 
     const now = Date.now();
+    const complianceStatus: 'compliant' | 'non-compliant' | 'pending' | 'under-review' =
+      existing?.complianceStatus ?? 'pending';
+    const sourceLookupValue = args.channelId;
     const requiredFields = {
       name: args.name,
       platform: 'youtube' as const,
       handle: args.handle,
       channelId: args.channelId,
       source: 'youtube_api' as const,
-      sourceLookupValue: args.sourceLookupValue,
+      sourceLookupValue,
       sourceResolvedAt: now,
       lastDataRefresh: now,
-      complianceStatus: existing?.complianceStatus ?? 'pending',
+      complianceStatus,
     };
 
     const optionalFields = removeUndefined({
@@ -256,10 +254,10 @@ export const upsertYoutubeInfluencer = mutation({
       handle: args.handle,
       channelId: args.channelId,
       source: 'youtube_api',
-      sourceLookupValue: args.sourceLookupValue,
+      sourceLookupValue,
       sourceResolvedAt: now,
       lastDataRefresh: now,
-      complianceStatus: existing?.complianceStatus ?? 'pending',
+      complianceStatus,
       ...optionalFields,
     });
   },

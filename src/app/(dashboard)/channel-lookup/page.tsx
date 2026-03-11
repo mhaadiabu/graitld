@@ -132,7 +132,6 @@ export default function ChannelLookupPage() {
         topicCategories: result.topicCategories,
         country: result.country,
         channelCreatedAt: result.channelCreatedAt,
-        sourceLookupValue: query.trim(),
       });
 
       setImportMessage(
