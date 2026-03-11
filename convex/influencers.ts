@@ -183,11 +183,14 @@ export const updateInfluencer = mutation({
   },
 });
 
+<<<<<<< HEAD
+=======
 export const upsertYoutubeInfluencer = mutation({
   args: {
     name: v.string(),
     handle: v.string(),
     channelId: v.string(),
+    sourceLookupValue: v.string(),
     customUrl: v.optional(v.string()),
     profileImageUrl: v.optional(v.string()),
     description: v.optional(v.string()),
@@ -212,7 +215,11 @@ export const upsertYoutubeInfluencer = mutation({
     const now = Date.now();
     const complianceStatus: 'compliant' | 'non-compliant' | 'pending' | 'under-review' =
       existing?.complianceStatus ?? 'pending';
+<<<<<<< HEAD
     const sourceLookupValue = args.channelId;
+=======
+    const sourceLookupValue = args.sourceLookupValue;
+>>>>>>> 47061f6 (import channel fixes)
     const requiredFields = {
       name: args.name,
       platform: 'youtube' as const,
@@ -263,6 +270,7 @@ export const upsertYoutubeInfluencer = mutation({
   },
 });
 
+>>>>>>> 47061f6 (import channel fixes)
 export const deleteInfluencer = mutation({
   args: { id: v.id('influencers') },
   handler: async (ctx, args) => {

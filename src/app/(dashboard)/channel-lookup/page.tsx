@@ -68,6 +68,7 @@ function normalizeHandle(handle: string) {
 export default function ChannelLookupPage() {
   const upsertYoutubeInfluencer = useMutation(upsertYoutubeInfluencerRef);
 
+<<<<<<< HEAD
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -75,6 +76,7 @@ export default function ChannelLookupPage() {
   const [result, setResult] = useState<LookupResult | null>(null);
   const [importMessage, setImportMessage] = useState<string | null>(null);
 
+=======
   const hasLookup = useMemo(() => Boolean(result || error), [result, error]);
 
   const handleSearch = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -120,6 +122,10 @@ export default function ChannelLookupPage() {
         name: result.name,
         handle: normalizeHandle(result.handle),
         channelId: result.channelId,
+<<<<<<< HEAD
+=======
+        sourceLookupValue: query.trim(),
+>>>>>>> 47061f6 (import channel fixes)
         customUrl: result.customUrl,
         profileImageUrl: result.profileImageUrl,
         description: result.description,
@@ -143,6 +149,7 @@ export default function ChannelLookupPage() {
     } finally {
       setIsImporting(false);
     }
+>>>>>>> 47061f6 (import channel fixes)
   };
 
   return (
