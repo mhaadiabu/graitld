@@ -24,9 +24,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <AppSidebar />
       <SidebarInset>
         <DashboardHeader />
-        <main className='min-h-[calc(100svh-5rem)] flex-1 px-6 pt-4 pb-8'>
-          <div>{children}</div>
-        </main>
+        <div className='flex w-full flex-1 flex-col overflow-x-hidden px-4 pt-4 pb-8 sm:px-6'>
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -11,6 +11,7 @@ import {
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import type { Route } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -83,10 +84,7 @@ export const AppSidebar = () => {
     <Sidebar className='border-r border-sidebar-border bg-sidebar text-sidebar-foreground'>
       <SidebarHeader className='px-4 py-6'>
         <div className='flex items-center gap-3.5'>
-          {/* Refined Minimal Logo */}
-          <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-sidebar-primary to-sidebar-accent text-sidebar-primary-foreground shadow-lg shadow-sidebar-primary/20'>
-            <span className='font-heading text-sm font-bold tracking-tighter'>GRA</span>
-          </div>
+          <Image alt='GRA logo' src='/logo.png' width={40} height={40} className='shadow' />
           <div className='flex flex-col gap-0.5'>
             <span className='font-heading text-sm font-bold tracking-tight text-sidebar-foreground'>
               Tax Dashboard
@@ -144,7 +142,7 @@ export const AppSidebar = () => {
             <SidebarMenuButton
               variant='destructive'
               onClick={handleSignOut}
-              className='group flex h-10 w-full items-center gap-3 rounded-lg px-3 text-sidebar-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive'
+              className='flex items-center gap-3'
             >
               <HugeiconsIcon
                 icon={Logout03Icon}

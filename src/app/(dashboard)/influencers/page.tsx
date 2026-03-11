@@ -27,6 +27,7 @@ import {
   SheetDescription,
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
+// import { isAuthenticated } from '@/lib/auth-server';
 
 const PLATFORMS = ['youtube', 'tiktok'] as const;
 const COMPLIANCE_STATUSES = ['compliant', 'non-compliant', 'pending', 'under-review'] as const;
@@ -106,6 +107,7 @@ function PlatformBadge({ platform }: { platform: string }) {
  * @returns The React element for the Influencers page.
  */
 export default function InfluencersPage() {
+  // const isAuthenticated = isAuthenticated();
   const influencers = useQuery(api.influencers.getInfluencers, {});
   const createInfluencer = useMutation(api.influencers.createInfluencer);
   const deleteInfluencer = useMutation(api.influencers.deleteInfluencer);
@@ -223,7 +225,7 @@ export default function InfluencersPage() {
       </div>
 
       {/* Filters */}
-      <div className='flex flex-wrap gap-3'>
+      <div className='flex max-sm:flex-col flex-wrap gap-3'>
         <InputGroup className='min-w-50 flex-1 bg-card'>
           <InputGroupAddon align='inline-start'>
             <HugeiconsIcon icon={Search01Icon} size={14} className='text-muted-foreground' />
@@ -235,46 +237,48 @@ export default function InfluencersPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </InputGroup>
-        <Select
-          value={filterPlatform}
-          onValueChange={(value) => {
-            if (value) {
-              setFilterPlatform(value as (typeof PLATFORMS)[number] | 'all');
-            }
-          }}
-        >
-          <SelectTrigger className='min-w-[160px] bg-card'>
-            <SelectValue placeholder='All Platforms' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='all'>All Platforms</SelectItem>
-            {PLATFORMS.map((p) => (
-              <SelectItem key={p} value={p}>
-                {p.charAt(0).toUpperCase() + p.slice(1)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
-          value={filterStatus}
-          onValueChange={(value) => {
-            if (value) {
-              setFilterStatus(value as (typeof COMPLIANCE_STATUSES)[number] | 'all');
-            }
-          }}
-        >
-          <SelectTrigger className='min-w-[160px] bg-card'>
-            <SelectValue placeholder='All Statuses' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='all'>All Statuses</SelectItem>
-            {COMPLIANCE_STATUSES.map((s) => (
-              <SelectItem key={s} value={s}>
-                {s.replace('-', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className='flex w-full items-center justify-between gap-2'>
+          <Select
+            value={filterPlatform}
+            onValueChange={(value) => {
+              if (value) {
+                setFilterPlatform(value as (typeof PLATFORMS)[number] | 'all');
+              }
+            }}
+          >
+            <SelectTrigger className='min-w-40 bg-card'>
+              <SelectValue placeholder='All Platforms' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>All Platforms</SelectItem>
+              {PLATFORMS.map((p) => (
+                <SelectItem key={p} value={p}>
+                  {p.charAt(0).toUpperCase() + p.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={filterStatus}
+            onValueChange={(value) => {
+              if (value) {
+                setFilterStatus(value as (typeof COMPLIANCE_STATUSES)[number] | 'all');
+              }
+            }}
+          >
+            <SelectTrigger className='min-w-40 bg-card'>
+              <SelectValue placeholder='All Statuses' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>All Statuses</SelectItem>
+              {COMPLIANCE_STATUSES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s.replace('-', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Data table */}

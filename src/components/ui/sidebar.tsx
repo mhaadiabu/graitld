@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -279,7 +280,7 @@ function SidebarRail({ className, ...props }: React.ComponentProps<'button'>) {
       onClick={toggleSidebar}
       title='Toggle Sidebar'
       className={cn(
-        'absolute inset-y-0 z-20 hidden w-4 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] hover:after:bg-sidebar-border sm:flex ltr:-translate-x-1/2 rtl:-translate-x-1/2',
+        'absolute inset-y-0 z-20 hidden w-4 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:start-1/2 after:w-0.5 hover:after:bg-sidebar-border sm:flex ltr:-translate-x-1/2 rtl:-translate-x-1/2',
         'in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize',
         '[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
         'group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full hover:group-data-[collapsible=offcanvas]:bg-sidebar',
@@ -493,6 +494,7 @@ function SidebarMenuButton({
     tooltip?: string | React.ComponentProps<typeof TooltipContent>;
   } & VariantProps<typeof sidebarMenuButtonVariants>) {
   const { isMobile, state } = useSidebar();
+  const shouldWrapWithSheetClose = isMobile && !props.disabled && !props['aria-disabled'];
   const comp = useRender({
     defaultTagName: 'button',
     props: mergeProps<'button'>(
@@ -511,7 +513,7 @@ function SidebarMenuButton({
   });
 
   if (!tooltip) {
-    return comp;
+    return shouldWrapWithSheetClose ? <SheetClose render={comp} /> : comp;
   }
 
   if (typeof tooltip === 'string') {
@@ -522,7 +524,7 @@ function SidebarMenuButton({
 
   return (
     <Tooltip>
-      {comp}
+      {shouldWrapWithSheetClose ? <SheetClose render={comp} /> : comp}
       <TooltipContent
         side='right'
         align='center'
@@ -646,7 +648,9 @@ function SidebarMenuSubButton({
     size?: 'sm' | 'md';
     isActive?: boolean;
   }) {
-  return useRender({
+  const { isMobile } = useSidebar();
+  const shouldWrapWithSheetClose = isMobile && !props['aria-disabled'];
+  const comp = useRender({
     defaultTagName: 'a',
     props: mergeProps<'a'>(
       {
@@ -665,6 +669,8 @@ function SidebarMenuSubButton({
       active: isActive,
     },
   });
+
+  return shouldWrapWithSheetClose ? <SheetClose render={comp} /> : comp;
 }
 
 export {
