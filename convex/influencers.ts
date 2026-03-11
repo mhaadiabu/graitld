@@ -215,11 +215,19 @@ export const upsertYoutubeInfluencer = mutation({
       .unique();
 
     const now = Date.now();
-    const payload = removeUndefined({
+    const requiredFields = {
       name: args.name,
       platform: 'youtube' as const,
       handle: args.handle,
       channelId: args.channelId,
+      source: 'youtube_api' as const,
+      sourceLookupValue: args.sourceLookupValue,
+      sourceResolvedAt: now,
+      lastDataRefresh: now,
+      complianceStatus: existing?.complianceStatus ?? 'pending',
+    };
+
+    const optionalFields = removeUndefined({
       customUrl: args.customUrl,
       profileImageUrl: args.profileImageUrl,
       description: args.description,
@@ -232,19 +240,28 @@ export const upsertYoutubeInfluencer = mutation({
       topicCategories: args.topicCategories,
       country: args.country,
       channelCreatedAt: args.channelCreatedAt,
-      source: 'youtube_api' as const,
+    });
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        ...requiredFields,
+        ...optionalFields,
+      });
+      return existing._id;
+    }
+
+    return await ctx.db.insert('influencers', {
+      name: args.name,
+      platform: 'youtube',
+      handle: args.handle,
+      channelId: args.channelId,
+      source: 'youtube_api',
       sourceLookupValue: args.sourceLookupValue,
       sourceResolvedAt: now,
       lastDataRefresh: now,
       complianceStatus: existing?.complianceStatus ?? 'pending',
+      ...optionalFields,
     });
-
-    if (existing) {
-      await ctx.db.patch(existing._id, payload);
-      return existing._id;
-    }
-
-    return await ctx.db.insert('influencers', payload);
   },
 });
 
