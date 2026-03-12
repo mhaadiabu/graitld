@@ -63,6 +63,13 @@ function normalizeHandle(handle: string) {
   return handle.startsWith('@') ? handle.slice(1) : handle;
 }
 
+/**
+ * UI for looking up public YouTube channels by handle, channel ID, or URL and importing the channel data into the registry.
+ *
+ * Presents a searchable form, displays loading, error, and result states, preserves the exact user input that produced a lookup for use during import, and invokes a server mutation to create or update the influencer record by channel ID.
+ *
+ * @returns The React element for the Channel Lookup page.
+ */
 export default function ChannelLookupPage() {
   const upsertYoutubeInfluencer = useMutation(upsertYoutubeInfluencerRef);
 
@@ -71,6 +78,7 @@ export default function ChannelLookupPage() {
   const [isImporting, setIsImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<LookupResult | null>(null);
+  const [sourceLookupValue, setSourceLookupValue] = useState('');
   const [importMessage, setImportMessage] = useState<string | null>(null);
 
   const hasLookup = useMemo(() => Boolean(result || error), [result, error]);
@@ -83,6 +91,7 @@ export default function ChannelLookupPage() {
     setIsLoading(true);
     setError(null);
     setResult(null);
+    setSourceLookupValue('');
     setImportMessage(null);
 
     try {
@@ -99,9 +108,11 @@ export default function ChannelLookupPage() {
       }
 
       setResult({ ...data });
+      setSourceLookupValue(trimmed);
     } catch (lookupError) {
       setError(lookupError instanceof Error ? lookupError.message : 'Lookup failed.');
       setResult(null);
+      setSourceLookupValue('');
     } finally {
       setIsLoading(false);
     }
@@ -118,7 +129,7 @@ export default function ChannelLookupPage() {
         name: result.name,
         handle: normalizeHandle(result.handle),
         channelId: result.channelId,
-        sourceLookupValue: query.trim(),
+        sourceLookupValue: sourceLookupValue,
         customUrl: result.customUrl,
         profileImageUrl: result.profileImageUrl,
         description: result.description,

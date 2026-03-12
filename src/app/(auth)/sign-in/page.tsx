@@ -10,13 +10,12 @@ import { Label } from '@/components/ui/label';
 import { authClient } from '@/lib/auth-client';
 
 /**
- * Render the authentication page for the GRA Tax Dashboard with sign-in and sign-up modes.
+ * Render the GRA Tax Dashboard authentication page with switchable sign-in and sign-up modes.
  *
- * Displays GRA branding and an authentication form that switches between "sign in" and "create account"
- * modes, shows validation and error states, and manages loading state during submission. On successful
- * authentication the page navigates to the application home.
+ * Displays GRA branding alongside a form that manages credentials, validation/error states, and loading state;
+ * on successful authentication it navigates to the application home.
  *
- * @returns The React element for the sign-in / sign-up page containing branding and the authentication form.
+ * @returns The React element for the authentication (sign-in / sign-up) page.
  */
 export default function SignInPage() {
   const router = useRouter();
@@ -27,7 +26,7 @@ export default function SignInPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setLoading(true);

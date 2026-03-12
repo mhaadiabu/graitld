@@ -197,6 +197,12 @@ async function getChannelByHandle(handle: string) {
   return data.items?.[0] ?? null;
 }
 
+/**
+ * Retrieve a YouTube channel resource by legacy username.
+ *
+ * @param username - The channel's legacy username (the identifier used in /user/ URLs)
+ * @returns The first matching YouTube channel item, or `null` if no channel is found
+ */
 async function getChannelByUsername(username: string) {
   const data = await youtubeFetch<{ items?: YouTubeChannelItem[] }>('channels', {
     part: 'snippet,statistics,contentDetails,topicDetails,status',
@@ -205,16 +211,49 @@ async function getChannelByUsername(username: string) {
   return data.items?.[0] ?? null;
 }
 
+/**
+ * Finds a single YouTube channel ID that exactly matches the provided query's title or custom URL.
+ *
+ * The query is normalized by trimming, converting to lower case, and removing a leading `@` before comparison.
+ *
+ * @param query - A channel lookup string (name, handle with or without `@`, or other search text)
+ * @returns The matching channel's ID if exactly one exact match is found; `null` otherwise
+ */
 async function searchChannelId(query: string) {
-  const data = await youtubeFetch<{ items?: Array<{ id?: { channelId?: string } }> }>('search', {
+  const normalizedQuery = query.trim().toLowerCase().replace(/^@/, '');
+
+  const data = await youtubeFetch<{
+    items?: Array<{
+      id?: { channelId?: string };
+      snippet?: { title?: string; customUrl?: string };
+    }>;
+  }>('search', {
     part: 'snippet',
     q: query,
     type: 'channel',
-    maxResults: 1,
+    maxResults: 5,
   });
-  return data.items?.[0]?.id?.channelId ?? null;
+
+  const matches = (data.items ?? []).filter((item) => {
+    const channelId = item.id?.channelId;
+    if (!channelId) return false;
+
+    const title = item.snippet?.title?.trim().toLowerCase();
+    const customUrl = item.snippet?.customUrl?.trim().toLowerCase().replace(/^@/, '');
+
+    return title === normalizedQuery || customUrl === normalizedQuery;
+  });
+
+  return matches.length === 1 ? (matches[0]?.id?.channelId ?? null) : null;
 }
 
+/**
+ * Retrieves recent video IDs from an uploads playlist.
+ *
+ * @param uploadsPlaylistId - The uploads playlist ID to fetch items from.
+ * @param maxResults - Maximum number of playlist items to request (defaults to 10).
+ * @returns An array of video ID strings in the order returned by the API; an empty array if no videos are found.
+ */
 async function getRecentVideoIds(uploadsPlaylistId: string, maxResults = 10) {
   const data = await youtubeFetch<{ items?: YouTubePlaylistItem[] }>('playlistItems', {
     part: 'contentDetails',
