@@ -206,13 +206,31 @@ async function getChannelByUsername(username: string) {
 }
 
 async function searchChannelId(query: string) {
-  const data = await youtubeFetch<{ items?: Array<{ id?: { channelId?: string } }> }>('search', {
+  const normalizedQuery = query.trim().toLowerCase().replace(/^@/, '');
+
+  const data = await youtubeFetch<{
+    items?: Array<{
+      id?: { channelId?: string };
+      snippet?: { title?: string; customUrl?: string };
+    }>;
+  }>('search', {
     part: 'snippet',
     q: query,
     type: 'channel',
-    maxResults: 1,
+    maxResults: 5,
   });
-  return data.items?.[0]?.id?.channelId ?? null;
+
+  const matches = (data.items ?? []).filter((item) => {
+    const channelId = item.id?.channelId;
+    if (!channelId) return false;
+
+    const title = item.snippet?.title?.trim().toLowerCase();
+    const customUrl = item.snippet?.customUrl?.trim().toLowerCase().replace(/^@/, '');
+
+    return title === normalizedQuery || customUrl === normalizedQuery;
+  });
+
+  return matches.length === 1 ? (matches[0]?.id?.channelId ?? null) : null;
 }
 
 async function getRecentVideoIds(uploadsPlaylistId: string, maxResults = 10) {

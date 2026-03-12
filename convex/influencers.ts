@@ -66,6 +66,23 @@ const influencerFields = {
   notes: v.optional(v.string()),
 };
 
+function stripServerManagedInfluencerFields<T extends Record<string, unknown>>(value: T) {
+  const {
+    source: _source,
+    sourceLookupValue: _sourceLookupValue,
+    sourceResolvedAt: _sourceResolvedAt,
+    sourceRefreshError: _sourceRefreshError,
+    ...rest
+  } = value as T & {
+    source?: unknown;
+    sourceLookupValue?: unknown;
+    sourceResolvedAt?: unknown;
+    sourceRefreshError?: unknown;
+  };
+
+  return rest;
+}
+
 export const getInfluencers = query({
   args: {
     platform: v.optional(platformValidator),
@@ -175,8 +192,10 @@ export const createInfluencer = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
+    const safeArgs = stripServerManagedInfluencerFields(args);
+
     return await ctx.db.insert('influencers', {
-      ...args,
+      ...safeArgs,
       complianceStatus: args.complianceStatus ?? 'pending',
       source: 'manual',
       lastDataRefresh: Date.now(),
@@ -195,7 +214,8 @@ export const updateInfluencer = mutation({
     await requireAuth(ctx);
 
     const { id, ...updates } = args;
-    const cleanUpdates = removeUndefined(updates);
+    const safeUpdates = stripServerManagedInfluencerFields(updates);
+    const cleanUpdates = removeUndefined(safeUpdates);
 
     await ctx.db.patch(id, cleanUpdates);
   },
@@ -239,6 +259,7 @@ export const upsertYoutubeInfluencer = mutation({
       source: 'youtube_api' as const,
       sourceLookupValue: args.sourceLookupValue,
       sourceResolvedAt: now,
+      sourceRefreshError: undefined,
       lastDataRefresh: now,
       complianceStatus,
     };
