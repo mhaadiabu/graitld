@@ -289,7 +289,7 @@ export default function InfluencersPage() {
                     </td>
 
                     <td className='px-4 py-4 text-right'>
-                      <p className='font-mono text-xs font-medium text-accent'>
+                      <p className='font-mono text-xs font-medium text-chart-5'>
                         {channel.estimatedTax !== undefined ? formatCurrency(channel.estimatedTax) : '--'}
                       </p>
                       <p className='mt-1 text-xs text-muted-foreground'>

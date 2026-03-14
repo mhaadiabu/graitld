@@ -81,7 +81,7 @@ export default function AnalyticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className='font-heading text-2xl font-bold text-accent'>
+            <p className='font-heading text-2xl font-bold text-chart-5'>
               {formatCurrency(metrics.totalTaxLiability)}
             </p>
           </CardContent>

@@ -75,7 +75,7 @@ export default function OverviewPage() {
   }
 
   return (
-    <div className='stagger-children animate-page-enter mx-auto w-full max-w-400 space-y-8 p-1'>
+    <div className='stagger-children mx-auto w-full max-w-[1600px] space-y-8 p-1'>
       <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-4'>
         <MetricCard
           label='Tracked Channels'
@@ -86,7 +86,7 @@ export default function OverviewPage() {
           label='Estimated Tax Output'
           value={formatCurrency(stats.totalEstimatedTax, { compact: true })}
           subtitle='Derived separately from public metadata and source inputs'
-          accentClass='text-accent'
+          accentClass='text-chart-5'
         />
         <MetricCard
           label='Manual Input Coverage'
@@ -231,7 +231,7 @@ export default function OverviewPage() {
             <CardTitle className='font-heading text-sm font-bold tracking-widest text-muted-foreground uppercase'>
               Priority Channels
             </CardTitle>
-            <Button variant='link' className='h-auto p-0 text-xs font-medium text-accent'>
+            <Button variant='link' className='h-auto p-0 text-xs font-medium text-primary'>
               View All
             </Button>
           </CardHeader>
@@ -283,7 +283,7 @@ export default function OverviewPage() {
             <CardTitle className='font-heading text-sm font-bold tracking-widest text-muted-foreground uppercase'>
               Recent Activity
             </CardTitle>
-            <Button variant='link' className='h-auto p-0 text-xs font-medium text-accent'>
+            <Button variant='link' className='h-auto p-0 text-xs font-medium text-primary'>
               View All
             </Button>
           </CardHeader>
