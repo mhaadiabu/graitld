@@ -1,6 +1,6 @@
 'use client';
 
-import { Clock01Icon, Moon02Icon, Settings01Icon, Sun01Icon } from '@hugeicons/core-free-icons';
+import { Clock01Icon, InformationCircleIcon, Moon02Icon, Settings01Icon, Sun01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useQuery } from 'convex/react';
 import { api } from '~convex/_generated/api';
@@ -30,6 +30,7 @@ export default function SettingsPage() {
     { id: 'appearance' as const, label: 'Appearance', icon: Sun01Icon },
     { id: 'connections' as const, label: 'Connections', icon: Settings01Icon },
     { id: 'activity' as const, label: 'Activity Log', icon: Clock01Icon },
+    { id: 'about' as const, label: 'About', icon: InformationCircleIcon },
   ];
 
   const handleGoogleConnect = async () => {
@@ -68,6 +69,9 @@ export default function SettingsPage() {
       </TabsContent>
       <TabsContent value='activity'>
         <ActivitySection logs={recentLogs} />
+      </TabsContent>
+      <TabsContent value='about'>
+        <AboutSection />
       </TabsContent>
     </Tabs>
   );
