@@ -3,7 +3,9 @@
 import { Add01Icon, Search01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useMutation, useQuery } from 'convex/react';
-import { useState } from 'react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { useMemo, useState } from 'react';
 import { api } from '~convex/_generated/api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -65,6 +67,7 @@ export default function InfluencersPage() {
   const channels = useQuery(api.influencers.getChannels, {});
   const createChannel = useMutation(api.influencers.createChannel);
   const deleteChannel = useMutation(api.influencers.deleteChannel);
+  const searchParams = useSearchParams();
 
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<(typeof COMPLIANCE_STATUSES)[number] | 'all'>(
@@ -81,6 +84,40 @@ export default function InfluencersPage() {
     taxIdNumber: '',
     notes: '',
   });
+
+  const connectSuccess = searchParams.get('connectSuccess');
+  const connectError = searchParams.get('connectError');
+  const connectedChannelId = searchParams.get('channelId');
+
+  const connectNotice = useMemo(() => {
+    if (connectSuccess === '1') {
+      return {
+        tone: 'success' as const,
+        message:
+          connectedChannelId
+            ? `Connected YouTube analytics for ${connectedChannelId}.`
+            : 'Connected YouTube analytics successfully.',
+      };
+    }
+
+    if (connectError) {
+      const messages: Record<string, string> = {
+        missing_oauth_parameters: 'Google OAuth returned without the required parameters.',
+        session_mismatch: 'The Google callback did not match the signed-in officer session.',
+        channel_not_connectable: 'Import public YouTube data for that channel before connecting analytics.',
+        google_account_does_not_manage_channel:
+          'That Google account does not appear to manage the selected YouTube channel.',
+        access_denied: 'Google access was denied before the connection completed.',
+      };
+
+      return {
+        tone: 'error' as const,
+        message: messages[connectError] ?? connectError,
+      };
+    }
+
+    return null;
+  }, [connectError, connectSuccess, connectedChannelId]);
 
   if (channels === undefined) {
     return (
@@ -158,6 +195,18 @@ export default function InfluencersPage() {
 
   return (
     <div className='space-y-6'>
+      {connectNotice ? (
+        <div
+          className={
+            connectNotice.tone === 'success'
+              ? 'rounded-xl border border-success/30 bg-success/5 px-4 py-3 text-sm text-success'
+              : 'rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive'
+          }
+        >
+          {connectNotice.message}
+        </div>
+      ) : null}
+
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <div>
           <p className='text-sm text-muted-foreground'>
@@ -304,17 +353,33 @@ export default function InfluencersPage() {
                     </td>
 
                     <td className='px-4 py-4 text-right'>
-                      <button
-                        onClick={() =>
-                          deleteChannel({
-                            id: String(channel.docId ?? channel.legacyId ?? channel._id),
-                            table: channel.docId ? 'channels' : 'influencers',
-                          })
-                        }
-                        className='text-xs text-destructive/65 hover:text-destructive'
-                      >
-                        Remove
-                      </button>
+                      <div className='flex justify-end gap-3'>
+                        {!channel.channelId.startsWith('manual:') && !channel.channelId.startsWith('legacy:') ? (
+                          <Button
+                            variant='outline'
+                            size='sm'
+                            render={
+                              <Link
+                                href={`/api/youtube/connect?channelId=${encodeURIComponent(channel.channelId)}&returnTo=${encodeURIComponent('/influencers')}`}
+                              />
+                            }
+                            className='text-xs'
+                          >
+                            {channel.hasConnectedAnalytics ? 'Reconnect' : 'Connect YouTube'}
+                          </Button>
+                        ) : null}
+                        <button
+                          onClick={() =>
+                            deleteChannel({
+                              id: String(channel.docId ?? channel.legacyId ?? channel._id),
+                              table: channel.docId ? 'channels' : 'influencers',
+                            })
+                          }
+                          className='text-xs text-destructive/65 hover:text-destructive'
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

@@ -3,12 +3,11 @@
 import { Clock01Icon, InformationCircleIcon, Moon02Icon, Settings01Icon, Sun01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useQuery } from 'convex/react';
+import Link from 'next/link';
 import { api } from '~convex/_generated/api';
 
 import Image from 'next/image';
-import { authClient } from '@/lib/auth-client';
 import { useTheme } from 'next-themes';
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -24,7 +23,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const recentLogs = useQuery(api.auditLogs.getRecentLogs, { limit: 15 });
-  const [connectingGoogle, setConnectingGoogle] = useState(false);
 
   const tabs = [
     { id: 'appearance' as const, label: 'Appearance', icon: Sun01Icon },
@@ -32,20 +30,6 @@ export default function SettingsPage() {
     { id: 'activity' as const, label: 'Activity Log', icon: Clock01Icon },
     { id: 'about' as const, label: 'About', icon: InformationCircleIcon },
   ];
-
-  const handleGoogleConnect = async () => {
-    setConnectingGoogle(true);
-    try {
-      await authClient.signIn.social({
-        provider: 'google',
-        callbackURL: '/settings',
-      });
-    } catch (error) {
-      console.error('Google OAuth start failed:', error);
-    } finally {
-      setConnectingGoogle(false);
-    }
-  };
 
   return (
     <Tabs defaultValue='appearance' className='space-y-6'>
@@ -62,10 +46,7 @@ export default function SettingsPage() {
         <AppearanceSection theme={theme} setTheme={setTheme} />
       </TabsContent>
       <TabsContent value='connections'>
-        <ConnectionsSection
-          connectingGoogle={connectingGoogle}
-          onConnectGoogle={handleGoogleConnect}
-        />
+        <ConnectionsSection />
       </TabsContent>
       <TabsContent value='activity'>
         <ActivitySection logs={recentLogs} />
@@ -77,43 +58,41 @@ export default function SettingsPage() {
   );
 }
 
-function ConnectionsSection({
-  connectingGoogle,
-  onConnectGoogle,
-}: {
-  connectingGoogle: boolean;
-  onConnectGoogle: () => Promise<void>;
-}) {
+function ConnectionsSection() {
   return (
     <div className='rounded-xl border border-border/60 bg-card p-6'>
       <h2 className='font-heading text-base font-semibold'>Connected Analytics</h2>
       <p className='mt-1 text-sm text-muted-foreground'>
-        Google OAuth is optional and only used when a channel owner authorizes private analytics
-        access. Public YouTube lookup remains separate.
+        Analytics connections now start from an individual channel so each Google authorization is
+        linked to the correct YouTube channel record.
       </p>
 
       <div className='mt-6 grid gap-4 md:grid-cols-[1.4fr_1fr]'>
         <div className='rounded-xl border border-border/60 bg-background/60 p-4'>
           <p className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
-            What connection enables
+            How it works
           </p>
           <div className='mt-3 space-y-2 text-sm text-muted-foreground'>
-            <p>Channel-owner authorization only</p>
-            <p>Private YouTube Analytics access for approved scopes</p>
-            <p>Stronger revenue inputs for internal tax estimation</p>
-            <p>Reconnect and token expiry handling on the server side</p>
+            <p>Select a channel from the Channels page</p>
+            <p>Authorize Google access for that channel owner account</p>
+            <p>Validate that the Google account manages the selected YouTube channel</p>
+            <p>Store the connection and import the latest analytics revenue snapshot</p>
           </div>
         </div>
 
         <div className='rounded-xl border border-border/60 bg-background/60 p-4'>
           <p className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
-            Connect Google
+            Start from channels
           </p>
           <p className='mt-3 text-sm text-muted-foreground'>
-            Use the minimum required Google scopes for channel identity and analytics read access.
+            Use the per-channel `Connect YouTube` button so analytics never attach to the wrong
+            record.
           </p>
-          <Button onClick={onConnectGoogle} disabled={connectingGoogle} className='mt-4 w-full'>
-            {connectingGoogle ? 'Redirecting...' : 'Connect YouTube'}
+          <Button
+            className='mt-4 w-full'
+            render={<Link href='/influencers' />}
+          >
+            Open Channels
           </Button>
         </div>
       </div>
