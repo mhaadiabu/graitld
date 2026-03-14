@@ -12,8 +12,10 @@ import {
 } from 'recharts';
 import { api } from '~convex/_generated/api';
 
+import Link from 'next/link';
+
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCompactNumber, formatCurrency, formatRevenueSource } from '@/lib/product';
 
@@ -50,7 +52,7 @@ function MetricCard({
 
 function DashboardSkeleton() {
   return (
-    <div className='space-y-8 p-1'>
+    <div className='space-y-8'>
       <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-4'>
         {Array.from({ length: 4 }).map((_, index) => (
           <Skeleton key={index} className='h-32 rounded-2xl' />
@@ -75,7 +77,7 @@ export default function OverviewPage() {
   }
 
   return (
-    <div className='stagger-children mx-auto w-full max-w-[1600px] space-y-8 p-1'>
+    <div className='stagger-children mx-auto w-full max-w-[1600px] space-y-8'>
       <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-4'>
         <MetricCard
           label='Tracked Channels'
@@ -104,23 +106,25 @@ export default function OverviewPage() {
 
       <div className='grid gap-6 lg:grid-cols-3'>
         <Card className='glass-panel rounded-2xl border-0 p-0 lg:col-span-2'>
-          <CardHeader className='flex-row items-center justify-between px-6 pt-6'>
+          <CardHeader className='px-6 pt-6'>
             <CardTitle className='font-heading text-sm font-bold tracking-widest text-muted-foreground uppercase'>
               Revenue Inputs &amp; Tax Estimates
             </CardTitle>
-            <div className='flex gap-2'>
-              <span className='flex items-center gap-1.5 text-[10px] font-medium tracking-wider text-muted-foreground uppercase'>
-                <span className='h-2 w-2 rounded-full bg-[oklch(0.6_0.18_250)]' /> Revenue inputs
-              </span>
-              <span className='flex items-center gap-1.5 text-[10px] font-medium tracking-wider text-muted-foreground uppercase'>
-                <span className='h-2 w-2 rounded-full bg-[oklch(0.65_0.18_150)]' /> Tax estimates
-              </span>
-            </div>
+            <CardAction>
+              <div className='flex gap-2'>
+                <span className='flex items-center gap-1.5 text-[10px] font-medium tracking-wider text-muted-foreground uppercase'>
+                  <span className='h-2 w-2 rounded-full bg-[oklch(0.6_0.18_250)]' /> Revenue inputs
+                </span>
+                <span className='flex items-center gap-1.5 text-[10px] font-medium tracking-wider text-muted-foreground uppercase'>
+                  <span className='h-2 w-2 rounded-full bg-[oklch(0.65_0.18_150)]' /> Tax estimates
+                </span>
+              </div>
+            </CardAction>
           </CardHeader>
 
           <CardContent className='px-6 pb-6'>
             {revenueData && revenueData.length > 0 ? (
-              <div className='h-75 w-full'>
+              <div className='h-72 w-full'>
                 <ResponsiveContainer width='100%' height='100%'>
                   <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <defs>
@@ -227,13 +231,15 @@ export default function OverviewPage() {
 
       <div className='grid gap-6 lg:grid-cols-2'>
         <Card className='glass-panel rounded-2xl border-0 p-0'>
-          <CardHeader className='flex-row items-center justify-between px-6 pt-6'>
+          <CardHeader className='px-6 pt-6'>
             <CardTitle className='font-heading text-sm font-bold tracking-widest text-muted-foreground uppercase'>
               Priority Channels
             </CardTitle>
-            <Button variant='link' className='h-auto p-0 text-xs font-medium text-primary'>
-              View All
-            </Button>
+            <CardAction>
+              <Button variant='link' render={<Link href='/influencers' />} className='h-auto p-0 text-xs font-medium text-primary'>
+                View All
+              </Button>
+            </CardAction>
           </CardHeader>
 
           <CardContent className='px-6 pb-6'>
@@ -279,18 +285,20 @@ export default function OverviewPage() {
         </Card>
 
         <Card className='glass-panel rounded-2xl border-0 p-0'>
-          <CardHeader className='flex-row items-center justify-between px-6 pt-6'>
+          <CardHeader className='px-6 pt-6'>
             <CardTitle className='font-heading text-sm font-bold tracking-widest text-muted-foreground uppercase'>
               Recent Activity
             </CardTitle>
-            <Button variant='link' className='h-auto p-0 text-xs font-medium text-primary'>
-              View All
-            </Button>
+            <CardAction>
+              <Button variant='link' render={<Link href='/analytics' />} className='h-auto p-0 text-xs font-medium text-primary'>
+                View All
+              </Button>
+            </CardAction>
           </CardHeader>
           <CardContent className='px-6 pb-6'>
             {recentLogs && recentLogs.length > 0 ? (
               <div className='relative space-y-6 pl-2'>
-                <div className='absolute top-2 bottom-4 left-2.75 w-px bg-border/50' />
+                <div className='absolute top-2 bottom-4 left-[13px] w-px bg-border/50' />
 
                 {recentLogs.map((log) => (
                   <div key={log._id} className='relative flex items-start gap-4'>
