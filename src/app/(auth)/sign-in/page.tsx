@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import Image from 'next/image';
 
@@ -19,13 +19,15 @@ import { authClient } from '@/lib/auth-client';
  * @returns The React element for the sign-in / sign-up page containing branding and the authentication form.
  */
 export default function SignInPage() {
-  const router = useRouter();
+  const searchParams = useSearchParams();
   const [mode, setMode] = useState<'signIn' | 'signUp'>('signIn');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const returnTo = searchParams.get('returnTo') || '/';
+  const connectChannelId = searchParams.get('connectChannelId');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -53,7 +55,14 @@ export default function SignInPage() {
           return;
         }
       }
-      router.push('/');
+      if (connectChannelId) {
+        window.location.assign(
+          `/api/youtube/connect?channelId=${encodeURIComponent(connectChannelId)}&returnTo=${encodeURIComponent(returnTo)}`,
+        );
+        return;
+      }
+
+      window.location.assign(returnTo);
     } catch {
       setError('An unexpected error occurred');
     } finally {
