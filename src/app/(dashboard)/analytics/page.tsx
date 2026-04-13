@@ -19,6 +19,11 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatAnalyticsStatus, formatCurrency, formatRevenueSource } from '@/lib/product';
+import {
+  ESTIMATED_REVENUE_NOTE,
+  estimateRevenueFromViews,
+  formatEstimatedRevenueUsd,
+} from '@/lib/revenue-estimate';
 
 const COMPLIANCE_COLORS: Record<string, string> = {
   compliant: 'oklch(0.55 0.16 150)',
@@ -252,7 +257,9 @@ export default function AnalyticsPage() {
                         <p className='mt-1 text-xs text-muted-foreground'>
                           {channel.estimatedAnnualRevenue !== undefined
                             ? `${formatCurrency(channel.estimatedAnnualRevenue)} annual input tracked`
-                            : 'No confirmed revenue input yet'}
+                            : channel.totalViews !== undefined
+                              ? `${formatEstimatedRevenueUsd(estimateRevenueFromViews(channel.totalViews, channel.topicCategories ?? []))} estimated revenue — ${ESTIMATED_REVENUE_NOTE}`
+                              : 'No confirmed revenue input yet'}
                         </p>
                       </div>
                       <div className='flex items-center gap-2'>
