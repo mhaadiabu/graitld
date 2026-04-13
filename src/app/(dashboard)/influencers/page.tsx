@@ -35,6 +35,11 @@ import {
   formatRevenueSource,
   titleCaseLabel,
 } from '@/lib/product';
+import {
+  ESTIMATED_REVENUE_DISCLAIMER,
+  estimateRevenueFromViews,
+  formatEstimatedRevenueUsd,
+} from '@/lib/revenue-estimate';
 
 const COMPLIANCE_STATUSES = ['compliant', 'non-compliant', 'pending', 'under-review'] as const;
 
@@ -327,14 +332,40 @@ export default function InfluencersPage() {
                     </td>
 
                     <td className='px-4 py-4 text-right'>
-                      <p className='font-mono text-xs'>
-                        {channel.estimatedAnnualRevenue !== undefined
-                          ? formatCurrency(channel.estimatedAnnualRevenue)
-                          : '--'}
-                      </p>
-                      <p className='mt-1 text-xs text-muted-foreground'>
-                        {formatRevenueSource(channel.revenueSource)}
-                      </p>
+                      {channel.estimatedAnnualRevenue !== undefined ? (
+                        <>
+                          <p className='font-mono text-xs'>
+                            {formatCurrency(channel.estimatedAnnualRevenue)}
+                          </p>
+                          <p className='mt-1 text-xs text-muted-foreground'>
+                            {formatRevenueSource(channel.revenueSource)}
+                          </p>
+                        </>
+                      ) : channel.totalViews !== undefined ? (
+                        <>
+                          <p className='font-mono text-xs'>
+                            {formatEstimatedRevenueUsd(
+                              estimateRevenueFromViews(
+                                channel.totalViews,
+                                channel.topicCategories ?? [],
+                              ),
+                            )}
+                          </p>
+                          <p className='mt-1 text-xs text-muted-foreground'>
+                            Estimated Revenue
+                          </p>
+                          <p className='mt-0.5 max-w-[160px] text-[10px] leading-tight text-muted-foreground/70'>
+                            {ESTIMATED_REVENUE_DISCLAIMER}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className='font-mono text-xs'>--</p>
+                          <p className='mt-1 text-xs text-muted-foreground'>
+                            {formatRevenueSource(channel.revenueSource)}
+                          </p>
+                        </>
+                      )}
                     </td>
 
                     <td className='px-4 py-4 text-right'>
