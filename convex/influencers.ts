@@ -265,10 +265,10 @@ async function upsertAnalyticsSyncSnapshot(
 
   // Use actual analytics revenue when available; fall back to a view-count
   // RPM estimate so tax is always derived regardless of revenue source.
-  const DEFAULT_RPM = 4; // GHS per 1,000 views (conservative default)
+  const FALLBACK_RPM_GHS = 4; // GHS per 1,000 views (conservative built-in estimate)
   const taxableRevenue =
     args.estimatedRevenue ??
-    (args.views !== undefined ? (args.views / 1000) * DEFAULT_RPM : undefined);
+    (args.views !== undefined ? (args.views / 1000) * FALLBACK_RPM_GHS : undefined);
 
   if (taxableRevenue !== undefined) {
     const existingTaxEstimates = await ctx.db
