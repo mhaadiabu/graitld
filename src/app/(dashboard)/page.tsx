@@ -148,7 +148,7 @@ export default function OverviewPage() {
                 <Select
                   value={String(taxPeriodDays)}
                   onValueChange={(value) => {
-                    if (value) setTaxPeriodDays(Number(value));
+                    setTaxPeriodDays(Number(value));
                   }}
                 >
                   <SelectTrigger className='h-8 w-[110px] text-[10px] tracking-wider uppercase'>

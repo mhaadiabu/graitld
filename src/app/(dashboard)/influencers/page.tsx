@@ -274,7 +274,7 @@ export default function InfluencersPage() {
         <Select
           value={String(taxPeriodDays)}
           onValueChange={(value) => {
-            if (value) setTaxPeriodDays(Number(value));
+            setTaxPeriodDays(Number(value));
           }}
         >
           <SelectTrigger className='w-full bg-card sm:w-44'>

@@ -45,6 +45,7 @@ function estimateAnnualRevenue(channel: {
   estimatedMonthlyRevenue?: number;
   totalViews?: number;
   topicCategories?: string[];
+  channelCreatedAt?: number;
 }) {
   if (channel.estimatedAnnualRevenue !== undefined) {
     return channel.estimatedAnnualRevenue;
@@ -55,7 +56,13 @@ function estimateAnnualRevenue(channel: {
   }
 
   if (channel.totalViews !== undefined) {
-    return estimateRevenueFromViews(channel.totalViews, channel.topicCategories ?? []);
+    const lifetimeRevenue = estimateRevenueFromViews(channel.totalViews, channel.topicCategories ?? []);
+    if (!channel.channelCreatedAt) {
+      return lifetimeRevenue;
+    }
+
+    const ageDays = Math.max(30, (Date.now() - channel.channelCreatedAt) / (1000 * 60 * 60 * 24));
+    return lifetimeRevenue * (DAYS_IN_YEAR / ageDays);
   }
 
   return undefined;
@@ -66,6 +73,7 @@ export function estimateTaxForPeriod(channel: {
   estimatedMonthlyRevenue?: number;
   totalViews?: number;
   topicCategories?: string[];
+  channelCreatedAt?: number;
 }, periodDays: number): number | undefined {
   const annualRevenue = estimateAnnualRevenue(channel);
   if (annualRevenue === undefined) return undefined;
