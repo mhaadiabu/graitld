@@ -1,6 +1,13 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 
+const notificationSeverity = v.union(
+  v.literal('info'),
+  v.literal('warning'),
+  v.literal('error'),
+  v.literal('success'),
+);
+
 const complianceStatus = v.union(
   v.literal('compliant'),
   v.literal('non-compliant'),
@@ -220,4 +227,29 @@ export default defineSchema({
       searchField: 'name',
       filterFields: ['platform', 'complianceStatus'],
     }),
+
+  systemConfig: defineTable({
+    key: v.string(),
+    value: v.any(),
+    label: v.optional(v.string()),
+    description: v.optional(v.string()),
+    category: v.optional(v.string()),
+    updatedBy: v.optional(v.string()),
+    updatedAt: v.optional(v.number()),
+  }).index('by_key', ['key']),
+
+  notifications: defineTable({
+    title: v.string(),
+    message: v.string(),
+    severity: notificationSeverity,
+    entityType: v.optional(v.string()),
+    entityId: v.optional(v.string()),
+    actionUrl: v.optional(v.string()),
+    readBy: v.optional(v.array(v.string())),
+    dismissedBy: v.optional(v.array(v.string())),
+    createdAt: v.number(),
+    expiresAt: v.optional(v.number()),
+  })
+    .index('by_createdAt', ['createdAt'])
+    .index('by_severity', ['severity']),
 });
