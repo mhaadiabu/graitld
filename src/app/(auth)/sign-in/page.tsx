@@ -57,7 +57,7 @@ export default function SignInPage() {
     } catch {
       setError('An unexpected error occurred');
     } finally {
-     
+
       setLoading(false);
     }
   };
@@ -104,21 +104,8 @@ export default function SignInPage() {
             </p>
           </blockquote>
           <div className='flex gap-8 text-white/40'>
-            <div>
-              <p className='font-heading text-3xl font-bold text-[#D4A843]'>GH&#8373;</p>
-              <p className='mt-1 text-xs tracking-wider uppercase'>Revenue Tracking</p>
-            </div>
-            <div className='h-12 w-px bg-white/10' />
-            <div>
-              <p className='font-heading text-3xl font-bold text-[#006B3F]'>2</p>
-              <p className='mt-1 text-xs tracking-wider uppercase'>Platforms Monitored</p>
-            </div>
-            <div className='h-12 w-px bg-white/10' />
-            <div>
-              <p className='font-heading text-3xl font-bold text-white/70'>16</p>
-              <p className='mt-1 text-xs tracking-wider uppercase'>Regions Covered</p>
-            </div>
           </div>
+
         </div>
 
         <p className='relative z-10 text-xs text-white/30'>
