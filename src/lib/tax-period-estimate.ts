@@ -12,7 +12,7 @@ const DAYS_IN_YEAR = 365;
 
 // Ghana Revenue Authority progressive personal income tax brackets (annual, GHS).
 const GHA_TAX_BRACKETS: Array<{ limit: number; rate: number }> = [
-  { limit: 5_880, rate: 0 },
+  { limit: 4_880, rate: 0 },
   { limit: 1_320, rate: 0.05 },
   { limit: 1_560, rate: 0.1 },
   { limit: 38_000, rate: 0.175 },
