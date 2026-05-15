@@ -103,9 +103,6 @@ export default function SignInPage() {
               Building a transparent and efficient tax framework for Ghana&apos;s digital economy.
             </p>
           </blockquote>
-          <div className='flex gap-8 text-white/40'>
-          </div>
-
         </div>
 
         <p className='relative z-10 text-xs text-white/30'>

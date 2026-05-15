@@ -1,5 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
+import { usdToGhs } from './currency';
+
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const GOOGLE_USERINFO_URL = 'https://openidconnect.googleapis.com/v1/userinfo';
@@ -249,11 +251,11 @@ export async function fetchYouTubeRevenueSnapshot(accessToken: string): Promise<
   return {
     periodStart: startDate.getTime(),
     periodEnd: endDate.getTime(),
-    estimatedRevenue: toOptionalNumber(values.estimatedRevenue),
-    estimatedAdRevenue: toOptionalNumber(values.estimatedAdRevenue),
-    estimatedRedRevenue: toOptionalNumber(values.estimatedRedRevenue),
+    estimatedRevenue: usdToGhs(toOptionalNumber(values.estimatedRevenue)),
+    estimatedAdRevenue: usdToGhs(toOptionalNumber(values.estimatedAdRevenue)),
+    estimatedRedRevenue: usdToGhs(toOptionalNumber(values.estimatedRedRevenue)),
     monetizedPlaybacks: toOptionalNumber(values.monetizedPlaybacks),
-    cpm: toOptionalNumber(values.cpm),
+    cpm: usdToGhs(toOptionalNumber(values.cpm)),
     views: toOptionalNumber(values.views),
     watchTimeMinutes: toOptionalNumber(values.estimatedMinutesWatched),
     likes: toOptionalNumber(values.likes),
