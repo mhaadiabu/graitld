@@ -1,6 +1,8 @@
 import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
+import type { QueryCtx } from './_generated/server';
+import type { DataModel } from './_generated/dataModel';
 import { requireAuth } from './auth';
 
 // Default system configuration values shipped with the platform.
@@ -59,7 +61,43 @@ export const SYSTEM_CONFIG_DEFAULTS = {
     description: 'Per YouTube API policy, stored metadata must be refreshed or deleted within this window.',
     category: 'System',
   },
+  'tax.progressive_brackets_ghs': {
+    value: [
+      { limit: 5880, rate: 0 },
+      { limit: 1320, rate: 0.05 },
+      { limit: 1560, rate: 0.10 },
+      { limit: 38000, rate: 0.175 },
+      { limit: 192000, rate: 0.25 },
+      { limit: 366240, rate: 0.30 },
+      { limit: Infinity, rate: 0.35 },
+    ],
+    label: 'Ghana Progressive Tax Brackets',
+    description: 'Annual progressive tax brackets for Ghana Revenue Authority (JSON array).',
+    category: 'Tax & Revenue',
+  },
 } as const;
+
+/**
+ * Internal helper to fetch system configuration values by their keys.
+ * Returns a map of key -> value.
+ */
+export async function getConfigValues<T extends string>(
+  ctx: QueryCtx,
+  keys: T[],
+): Promise<Record<T, any>> {
+  const stored = await ctx.db
+    .query('systemConfig')
+    .collect(); // collecting all is fine for small config sets, or use filter
+  
+  const result = {} as Record<T, any>;
+  const storedMap = new Map(stored.map((s: any) => [s.key, s.value]));
+
+  for (const key of keys) {
+    result[key] = storedMap.get(key) ?? SYSTEM_CONFIG_DEFAULTS[key as keyof typeof SYSTEM_CONFIG_DEFAULTS]?.value;
+  }
+
+  return result;
+}
 
 // ─── System Config Queries ────────────────────────────────────────────────────
 

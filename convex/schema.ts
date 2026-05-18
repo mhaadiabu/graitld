@@ -252,4 +252,12 @@ export default defineSchema({
   })
     .index('by_createdAt', ['createdAt'])
     .index('by_severity', ['severity']),
+
+  users: defineTable({
+    name: v.string(),
+    email: v.string(),
+    role: v.union(v.literal('OFFICER'), v.literal('SUPERVISOR'), v.literal('ADMIN')),
+    status: v.union(v.literal('active'), v.literal('suspended')),
+    lastActiveAt: v.optional(v.number()),
+  }).index('by_email', ['email']),
 });

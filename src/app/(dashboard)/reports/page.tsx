@@ -1,11 +1,12 @@
 'use client';
 
-import { Download01Icon, File01Icon } from '@hugeicons/core-free-icons';
+import { Download01Icon, File01Icon, PrinterIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useQuery } from 'convex/react';
 import { useState } from 'react';
 import { api } from '~convex/_generated/api';
 
+import { ReportDocument } from '@/components/reports/report-document';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -41,7 +42,10 @@ export default function ReportsPage() {
   const channels = useQuery(api.influencers.getInfluencers, {});
   const compliance = useQuery(api.analytics.getComplianceBreakdown);
 
-  const [generating, setGenerating] = useState(false);
+  const [activeReport, setActiveReport] = useState<{
+    type: ReportType;
+    data: any;
+  } | null>(null);
 
   if (metrics === undefined || channels === undefined || compliance === undefined) {
     return (
@@ -57,92 +61,58 @@ export default function ReportsPage() {
     );
   }
 
-  const generateReport = async (type: ReportType) => {
-    setGenerating(true);
+  const exportToCSV = (type: ReportType) => {
+    let headers: string[] = [];
+    let rows: string[][] = [];
 
-    const now = new Date().toLocaleDateString(currencyConfig.locale, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-
-    const header = `
-GHANA REVENUE AUTHORITY
-GRA YOUTUBE TAX DASHBOARD
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Generated: ${now}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-`;
-
-    let reportContent = '';
-
-    if (type === 'tax-summary') {
-      reportContent = `${header}TAX SUMMARY REPORT
-
-Tracked Channels: ${metrics.totalChannels}
-Estimated Revenue Inputs: ${formatCurrency(metrics.totalEstimatedRevenue)}
-Estimated Tax Output: ${formatCurrency(metrics.totalTaxLiability)}
-Compliance Rate: ${metrics.complianceRate}%
-Public-only Channels: ${metrics.publicOnlyChannels}
-Connected Analytics Channels: ${metrics.connectedAnalyticsChannels}
-Manual Input Channels: ${metrics.manualInputChannels}
-Action Required: ${metrics.actionRequiredChannels}
-`;
+    if (type === 'channel-registry') {
+      headers = ['Name', 'Handle', 'Revenue Source', 'Compliance Status', 'Estimated Tax'];
+      rows = channels.map((c) => [
+        c.name,
+        `@${c.handle}`,
+        c.revenueSource,
+        c.complianceStatus || 'Pending',
+        c.estimatedTax?.toString() || '0',
+      ]);
+    } else if (type === 'tax-summary') {
+      headers = ['Metric', 'Value'];
+      rows = [
+        ['Total Channels', metrics.totalChannels.toString()],
+        ['Compliance Rate', `${metrics.complianceRate}%`],
+        ['Total Estimated Revenue', metrics.totalEstimatedRevenue.toString()],
+        ['Total Tax Liability', metrics.totalTaxLiability.toString()],
+      ];
     } else if (type === 'compliance-overview') {
-      reportContent = `${header}COMPLIANCE OVERVIEW
-
-Status Breakdown:
-${compliance.map((entry) => `  ${entry.status.toUpperCase().padEnd(16)} ${entry.count} channel(s)`).join('\n')}
-`;
-    } else if (type === 'channel-registry') {
-      reportContent = `${header}CHANNEL REGISTRY
-
-Total Records: ${channels.length}
-
-${'Name'.padEnd(24)} ${'Handle'.padEnd(20)} ${'Revenue Source'.padEnd(25)} Tax Estimate
-${'─'.repeat(92)}
-${channels
-  .map(
-    (channel) =>
-      `${channel.name.padEnd(24)} @${channel.handle.padEnd(19)} ${channel.revenueSource.padEnd(25)} ${channel.estimatedTax !== undefined ? formatCurrency(channel.estimatedTax) : 'Not calculated'}`,
-  )
-  .join('\n')}
-`;
-    } else if (type === 'source-readiness') {
-      reportContent = `${header}SOURCE READINESS REPORT
-
-Public imports active: ${channels.filter((channel) => channel.publicDataStatus === 'public_imported').length}
-Manual-only records: ${channels.filter((channel) => channel.publicDataStatus === 'manual_only').length}
-Public refresh failures: ${channels.filter((channel) => channel.publicDataStatus === 'refresh_failed').length}
-Connected analytics active: ${channels.filter((channel) => channel.analyticsStatus === 'active').length}
-Analytics reconnect or review needed: ${channels.filter((channel) => channel.actionRequired).length}
-
-Channels requiring follow-up:
-${channels
-  .filter((channel) => channel.actionRequired)
-  .map((channel) => `  - ${channel.name} (@${channel.handle}) — ${channel.analyticsStatus}`)
-  .join('\n') || '  None'}
-`;
+      headers = ['Status', 'Count'];
+      rows = compliance.map((c) => [c.status, c.count.toString()]);
+    } else {
+      headers = ['Name', 'Handle', 'Status', 'Action Required'];
+      rows = channels.map((c) => [c.name, `@${c.handle}`, c.analyticsStatus, c.actionRequired ? 'YES' : 'NO']);
     }
 
-    const blob = new Blob([reportContent], { type: 'text/plain' });
+    const csvContent = [headers.join(','), ...rows.map((r) => r.map((cell) => `"${cell}"`).join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `gra-${type}-${new Date().toISOString().split('T')[0]}.txt`;
-    anchor.click();
-    URL.revokeObjectURL(url);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `gra-${type}-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
-    setGenerating(false);
+  const openPreview = (type: ReportType) => {
+    setActiveReport({
+      type,
+      data: { metrics, channels, compliance },
+    });
   };
 
   return (
     <div className='stagger-children space-y-6'>
       <p className='text-sm text-muted-foreground'>
-        Generate source-aware reports for public YouTube imports, optional connected analytics,
-        manual financial inputs, and tax estimates. Public lookup never implies private revenue
-        access.
+        Generate professional GRA-branded reports or export raw data for Microsoft Excel and Access.
       </p>
 
       <div className='grid gap-4 sm:grid-cols-2'>
@@ -158,16 +128,26 @@ ${channels
               <div className='flex-1'>
                 <h3 className='font-heading text-sm font-semibold'>{report.label}</h3>
                 <p className='mt-1 text-xs text-muted-foreground'>{report.description}</p>
-                <Button
-                  onClick={() => generateReport(report.value)}
-                  disabled={generating}
-                  variant='outline'
-                  className='mt-4 gap-2 text-xs'
-                  size='sm'
-                >
-                  <HugeiconsIcon icon={Download01Icon} size={14} />
-                  Generate &amp; Download
-                </Button>
+                <div className='mt-4 flex flex-wrap gap-2'>
+                  <Button
+                    onClick={() => openPreview(report.value)}
+                    variant='outline'
+                    className='gap-2 text-xs'
+                    size='sm'
+                  >
+                    <HugeiconsIcon icon={PrinterIcon} size={14} />
+                    Print Preview
+                  </Button>
+                  <Button
+                    onClick={() => exportToCSV(report.value)}
+                    variant='ghost'
+                    className='gap-2 text-xs text-muted-foreground hover:text-foreground'
+                    size='sm'
+                  >
+                    <HugeiconsIcon icon={Download01Icon} size={14} />
+                    Download CSV
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -177,16 +157,26 @@ ${channels
       <Card>
         <CardHeader>
           <CardTitle className='font-heading text-sm font-semibold tracking-wider text-muted-foreground uppercase'>
-            Report Notes
+            Reporting Compliance
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className='text-sm text-muted-foreground'>
-            Downloaded reports reflect the current distinction between public channel metadata,
-            owner-authorized analytics, manual financial inputs, and internal tax estimates.
+          <p className='text-sm text-muted-foreground leading-relaxed'>
+            All generated reports are official documents of the Ghana Revenue Authority. 
+            <strong> Print Preview</strong> mode uses high-fidelity formatting optimized for A4 paper.
+            Use <strong> Download CSV</strong> for data migration into Microsoft Access databases or 
+            advanced analysis in Microsoft Excel.
           </p>
         </CardContent>
       </Card>
+
+      {activeReport && (
+        <ReportDocument
+          type={activeReport.type}
+          data={activeReport.data}
+          onClose={() => setActiveReport(null)}
+        />
+      )}
     </div>
   );
 }

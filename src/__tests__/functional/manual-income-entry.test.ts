@@ -30,8 +30,8 @@ import {
 // ---------------------------------------------------------------------------
 type AnyId = string & { __tableName?: string };
 
-function fakeId(table: string, index = 1): AnyId {
-  return `${table}:${index}` as AnyId;
+function fakeId(table: string, index = 1): any {
+  return `${table}:${index}` as any;
 }
 
 function emptyCollections() {

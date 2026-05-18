@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { CommandSearch } from '@/components/command-search';
+import { NotificationsBell } from '@/components/notifications-bell';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Kbd } from '@/components/ui/kbd';
@@ -36,6 +37,22 @@ const pageTitles: Record<string, { title: string; description: string }> = {
   '/settings': {
     title: 'Settings',
     description: 'Account and application preferences',
+  },
+  '/admin': {
+    title: 'Administration',
+    description: 'Platform configuration, audit logs, and system health',
+  },
+  '/admin/audit-log': {
+    title: 'Audit Log',
+    description: 'Complete platform activity history',
+  },
+  '/admin/system-config': {
+    title: 'System Configuration',
+    description: 'Tax rates, RPM benchmarks, and platform settings',
+  },
+  '/admin/notifications': {
+    title: 'Notifications',
+    description: 'Manage platform-wide system notifications',
   },
 };
 
@@ -107,6 +124,8 @@ export function DashboardHeader() {
           </Button>
 
           <Separator orientation='vertical' className='mx-1 h-5' />
+
+          <NotificationsBell />
 
           <Button
             onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}

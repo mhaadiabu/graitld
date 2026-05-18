@@ -1,5 +1,8 @@
-// Ghana Revenue Authority progressive income tax brackets (annual, GHS)
-const GHA_TAX_BRACKETS: Array<{ limit: number; rate: number }> = [
+/**
+ * Ghana Revenue Authority progressive income tax brackets (annual, GHS)
+ * Default fallback if not provided via system config.
+ */
+export const DEFAULT_GHA_TAX_BRACKETS: Array<{ limit: number; rate: number }> = [
   { limit: 5_880, rate: 0 },       // First 5,880 — tax free
   { limit: 1_320, rate: 0.05 },    // Next 1,320 at 5%   (5,881–7,200)
   { limit: 1_560, rate: 0.10 },    // Next 1,560 at 10%  (7,201–8,760)
@@ -13,13 +16,16 @@ const GHA_TAX_BRACKETS: Array<{ limit: number; rate: number }> = [
  * Calculate Ghana annual income tax using progressive brackets (GHS).
  * Returns the total tax owed, rounded to the nearest whole cedi.
  */
-export function calculateGhanaTax(annualIncome: number): number {
+export function calculateGhanaTax(
+  annualIncome: number,
+  brackets: Array<{ limit: number; rate: number }> = DEFAULT_GHA_TAX_BRACKETS
+): number {
   if (annualIncome <= 0) return 0;
 
   let tax = 0;
   let remaining = annualIncome;
 
-  for (const bracket of GHA_TAX_BRACKETS) {
+  for (const bracket of brackets) {
     if (remaining <= 0) break;
     const taxable = isFinite(bracket.limit)
       ? Math.min(remaining, bracket.limit)
@@ -34,7 +40,10 @@ export function calculateGhanaTax(annualIncome: number): number {
 /**
  * Compute the effective (blended) tax rate for a given annual income.
  */
-export function effectiveTaxRate(annualIncome: number): number {
+export function effectiveTaxRate(
+  annualIncome: number,
+  brackets: Array<{ limit: number; rate: number }> = DEFAULT_GHA_TAX_BRACKETS
+): number {
   if (annualIncome <= 0) return 0;
-  return calculateGhanaTax(annualIncome) / annualIncome;
+  return calculateGhanaTax(annualIncome, brackets) / annualIncome;
 }

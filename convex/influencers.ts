@@ -6,6 +6,7 @@ import { mutation, query } from './_generated/server';
 import { DEFAULT_TAX_RATE, loadChannelSummaries } from './channelData';
 import { calculateGhanaTax, effectiveTaxRate } from './tax';
 import { requireAuth } from './auth';
+import { getConfigValues } from './admin';
 
 const complianceStatusValidator = v.union(
   v.literal('compliant'),
@@ -98,6 +99,47 @@ function isConnectableBusinessChannelId(channelId: string) {
   return !channelId.startsWith('manual:') && !channelId.startsWith('legacy:');
 }
 
+/**
+ * Internal helper to resolve the appropriate RPM benchmark from system config
+ * based on channel topic categories.
+ */
+async function getRpmFromConfig(
+  ctx: MutationCtx,
+  topicCategories: string[] = [],
+): Promise<number> {
+  const configs = await getConfigValues(ctx, [
+    'tax.default_rpm_ghs',
+    'tax.rpm_finance_ghs',
+    'tax.rpm_tech_ghs',
+    'tax.rpm_education_ghs',
+    'tax.rpm_gaming_ghs',
+    'tax.rpm_entertainment_ghs',
+  ]);
+
+  const defaultRpm = configs['tax.default_rpm_ghs'];
+  if (topicCategories.length === 0) return defaultRpm;
+
+  const combined = topicCategories.join(' ').toLowerCase();
+
+  // Mapping logic matching the frontend but powered by admin-managed rates
+  if (['finance', 'investing', 'investment', 'financial'].some((k) => combined.includes(k)))
+    return configs['tax.rpm_finance_ghs'];
+  if (['tech', 'technology', 'software', 'programming', 'computing'].some((k) => combined.includes(k)))
+    return configs['tax.rpm_tech_ghs'];
+  if (
+    ['education', 'howto', 'how-to', 'tutorial', 'learning', 'academic'].some((k) =>
+      combined.includes(k),
+    )
+  )
+    return configs['tax.rpm_education_ghs'];
+  if (['gaming', 'game', 'video_game', 'videogame'].some((k) => combined.includes(k)))
+    return configs['tax.rpm_gaming_ghs'];
+  if (['entertainment', 'vlog', 'lifestyle', 'comedy', 'humor'].some((k) => combined.includes(k)))
+    return configs['tax.rpm_entertainment_ghs'];
+
+  return defaultRpm;
+}
+
 async function upsertManualFinancialSnapshot(
   ctx: MutationCtx,
   args: {
@@ -170,6 +212,9 @@ async function upsertTaxEstimateFromRevenue(
     return;
   }
 
+  const configs = await getConfigValues(ctx, ['tax.progressive_brackets_ghs']);
+  const brackets = configs['tax.progressive_brackets_ghs'];
+
   const existing = await ctx.db
     .query('taxEstimates')
     .withIndex('by_channelId', (q) => q.eq('channelId', args.channelId))
@@ -178,7 +223,7 @@ async function upsertTaxEstimateFromRevenue(
     (entry) => entry.periodStart === 1 && entry.periodEnd === 1 && entry.sourceType === 'manual',
   );
   const now = Date.now();
-  const estimatedTax = calculateGhanaTax(args.annualRevenue);
+  const estimatedTax = calculateGhanaTax(args.annualRevenue, brackets);
 
   const payload = {
     channelId: args.channelId,
@@ -190,7 +235,7 @@ async function upsertTaxEstimateFromRevenue(
     grossRevenue: args.annualRevenue,
     allowableDeductions: undefined,
     taxableIncome: args.annualRevenue,
-    taxRate: effectiveTaxRate(args.annualRevenue),
+    taxRate: effectiveTaxRate(args.annualRevenue, brackets),
     currency: 'GHS',
     estimatedTax,
     calculatedAt: now,
@@ -228,6 +273,7 @@ async function upsertAnalyticsSyncSnapshot(
     syncStatus: 'success' | 'partial' | 'failed';
     syncError?: string;
     calculatedBy: string;
+    topicCategories?: string[];
   },
 ) {
   const existingSyncs = await ctx.db
@@ -265,10 +311,21 @@ async function upsertAnalyticsSyncSnapshot(
 
   // Use actual analytics revenue when available; fall back to a view-count
   // RPM estimate so tax is always derived regardless of revenue source.
-  const FALLBACK_RPM_GHS = 4; // GHS per 1,000 views (conservative built-in estimate)
+  const configs = await getConfigValues(ctx, [
+    'tax.default_rpm_ghs',
+    'tax.rpm_finance_ghs',
+    'tax.rpm_tech_ghs',
+    'tax.rpm_education_ghs',
+    'tax.rpm_gaming_ghs',
+    'tax.rpm_entertainment_ghs',
+    'tax.progressive_brackets_ghs',
+  ]);
+  const brackets = configs['tax.progressive_brackets_ghs'];
+
+  const dynamicRpm = await getRpmFromConfig(ctx, args.topicCategories);
   const taxableRevenue =
     args.estimatedRevenue ??
-    (args.views !== undefined ? (args.views / 1000) * FALLBACK_RPM_GHS : undefined);
+    (args.views !== undefined ? (args.views / 1000) * dynamicRpm : undefined);
 
   if (taxableRevenue !== undefined) {
     const existingTaxEstimates = await ctx.db
@@ -282,7 +339,7 @@ async function upsertAnalyticsSyncSnapshot(
         entry.sourceType === 'analytics',
     );
 
-    const estimatedTax = calculateGhanaTax(taxableRevenue);
+    const estimatedTax = calculateGhanaTax(taxableRevenue, brackets);
     const taxPayload = {
       channelId: args.channelId,
       periodStart: args.periodStart,
@@ -293,7 +350,7 @@ async function upsertAnalyticsSyncSnapshot(
       grossRevenue: taxableRevenue,
       allowableDeductions: undefined,
       taxableIncome: taxableRevenue,
-      taxRate: effectiveTaxRate(taxableRevenue),
+      taxRate: effectiveTaxRate(taxableRevenue, brackets),
       currency: 'GHS',
       estimatedTax,
       calculatedAt: Date.now(),
@@ -726,6 +783,7 @@ export const completeChannelAnalyticsConnection = mutation({
         syncStatus: args.analytics.syncStatus,
         syncError: args.analytics.syncError,
         calculatedBy: actorId,
+        topicCategories: channel.topicCategories,
       });
     }
 

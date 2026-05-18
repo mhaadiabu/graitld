@@ -250,7 +250,7 @@ describe('effectiveTaxRate', () => {
   });
 
   it('is monotonically non-decreasing as income grows', () => {
-    const rates = [7_200, 8_760, 20_000, 100_000, 500_000].map(effectiveTaxRate);
+    const rates = [7_200, 8_760, 20_000, 100_000, 500_000].map(v => effectiveTaxRate(v));
     for (let i = 1; i < rates.length; i++) {
       expect(rates[i]!).toBeGreaterThanOrEqual(rates[i - 1]!);
     }
