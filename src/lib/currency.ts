@@ -6,11 +6,11 @@
  * displays everything in GHS, so we convert at the data-ingestion boundary
  * before the values reach the Convex backend or any UI component.
  *
- * The exchange rate defaults to 15.0 and can be overridden via the
- * `USD_TO_GHS_RATE` environment variable.
+ * The exchange rate defaults to 11.70 (Bank of Ghana interbank rate)
+ * and can be overridden via the `USD_TO_GHS_RATE` environment variable.
  */
 
-const DEFAULT_USD_TO_GHS_RATE = 15.0;
+const DEFAULT_USD_TO_GHS_RATE = 11.7;
 
 function getUsdToGhsRate(): number {
   const envRate = process.env.USD_TO_GHS_RATE;
