@@ -70,9 +70,11 @@ export function DashboardHeader() {
     description: '',
   };
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
 
   useEffect(() => {
+    setMounted(true);
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
@@ -132,9 +134,13 @@ export function DashboardHeader() {
             variant='ghost'
             size='icon'
             className='h-9 w-9'
-            title={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+            title={mounted ? `Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode` : 'Switch theme'}
           >
-            <HugeiconsIcon icon={resolvedTheme === 'dark' ? Sun01Icon : Moon02Icon} size={18} />
+            {mounted && resolvedTheme === 'dark' ? (
+              <HugeiconsIcon icon={Sun01Icon} size={18} />
+            ) : (
+              <HugeiconsIcon icon={Moon02Icon} size={18} />
+            )}
           </Button>
         </div>
       </header>

@@ -577,36 +577,42 @@ export const updateChannel = mutation({
 
     const channelId = getBusinessChannelId(
       args.channelId ?? existing.channelId,
-      args.handle ?? existing.handle ?? existing.name,
+      args.handle ?? existing.handle ?? existing.name ?? 'unknown',
     );
-    const handle = args.handle ? normalizeHandle(args.handle) : existing.handle ?? existing.name;
+    const handle = args.handle
+      ? normalizeHandle(args.handle)
+      : existing.handle ?? existing.name ?? channelId;
+    const name = args.name ?? existing.name ?? handle ?? channelId;
     const annualRevenue =
       args.estimatedAnnualRevenue ??
       (args.estimatedMonthlyRevenue !== undefined ? args.estimatedMonthlyRevenue * 12 : undefined);
 
-    await ctx.db.patch(args.id, {
+    const patchPayload: Record<string, any> = {
       channelId,
       handle,
-      customUrl: args.customUrl,
-      profileImageUrl: args.profileImageUrl,
-      name: args.name,
-      description: args.description,
-      country: args.country,
-      channelCreatedAt: args.channelCreatedAt,
-      topicCategories: args.topicCategories,
-      uploadsPlaylistId: args.uploadsPlaylistId,
-      subscribers: args.subscribers,
-      subscriberCountHidden: args.subscriberCountHidden,
-      totalViews: args.totalViews,
-      totalVideos: args.totalVideos,
-      avgEngagementRate: args.avgEngagementRate,
-      email: args.email,
-      phone: args.phone,
-      taxIdNumber: args.taxIdNumber,
-      notes: args.notes,
-      complianceStatus: args.complianceStatus,
-      complianceScore: args.complianceScore,
-    });
+      name,
+    };
+
+    if (args.customUrl !== undefined) patchPayload.customUrl = args.customUrl;
+    if (args.profileImageUrl !== undefined) patchPayload.profileImageUrl = args.profileImageUrl;
+    if (args.description !== undefined) patchPayload.description = args.description;
+    if (args.country !== undefined) patchPayload.country = args.country;
+    if (args.channelCreatedAt !== undefined) patchPayload.channelCreatedAt = args.channelCreatedAt;
+    if (args.topicCategories !== undefined) patchPayload.topicCategories = args.topicCategories;
+    if (args.uploadsPlaylistId !== undefined) patchPayload.uploadsPlaylistId = args.uploadsPlaylistId;
+    if (args.subscribers !== undefined) patchPayload.subscribers = args.subscribers;
+    if (args.subscriberCountHidden !== undefined) patchPayload.subscriberCountHidden = args.subscriberCountHidden;
+    if (args.totalViews !== undefined) patchPayload.totalViews = args.totalViews;
+    if (args.totalVideos !== undefined) patchPayload.totalVideos = args.totalVideos;
+    if (args.avgEngagementRate !== undefined) patchPayload.avgEngagementRate = args.avgEngagementRate;
+    if (args.email !== undefined) patchPayload.email = args.email;
+    if (args.phone !== undefined) patchPayload.phone = args.phone;
+    if (args.taxIdNumber !== undefined) patchPayload.taxIdNumber = args.taxIdNumber;
+    if (args.notes !== undefined) patchPayload.notes = args.notes;
+    if (args.complianceStatus !== undefined) patchPayload.complianceStatus = args.complianceStatus;
+    if (args.complianceScore !== undefined) patchPayload.complianceScore = args.complianceScore;
+
+    await ctx.db.patch(args.id, patchPayload);
 
     const actorId = getActorId({ userId: user.userId, _id: String(user._id) });
 

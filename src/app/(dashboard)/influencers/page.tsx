@@ -1,6 +1,6 @@
 'use client';
 
-import { Add01Icon, Search01Icon } from '@hugeicons/core-free-icons';
+import { Add01Icon, Edit01Icon, Search01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useMutation, useQuery } from 'convex/react';
 import Link from 'next/link';
@@ -73,9 +73,31 @@ function SourceBadge({ label, variant = 'outline' }: { label: string; variant?: 
   );
 }
 
+// ─── Types ──────────────────────────────────────────────────────────────────
+type EditForm = {
+  complianceStatus: (typeof COMPLIANCE_STATUSES)[number];
+  email: string;
+  phone: string;
+  taxIdNumber: string;
+  notes: string;
+  estimatedMonthlyRevenue: string;
+  estimatedAnnualRevenue: string;
+};
+
+const EDIT_FORM_DEFAULTS: EditForm = {
+  complianceStatus: 'pending',
+  email: '',
+  phone: '',
+  taxIdNumber: '',
+  notes: '',
+  estimatedMonthlyRevenue: '',
+  estimatedAnnualRevenue: '',
+};
+
 export default function InfluencersPage() {
   const channels = useQuery(api.influencers.getChannels, {});
   const createChannel = useMutation(api.influencers.createChannel);
+  const updateChannel = useMutation(api.influencers.updateChannel);
   const deleteChannel = useMutation(api.influencers.deleteChannel);
   const searchParams = useSearchParams();
 
@@ -95,6 +117,26 @@ export default function InfluencersPage() {
     taxIdNumber: '',
     notes: '',
   });
+
+  // ── Edit channel state ─────────────────────────────────────────────────────
+  const [editingChannel, setEditingChannel] = useState<NonNullable<typeof channels>[number] | null>(null);
+  const [editForm, setEditForm] = useState<EditForm>(EDIT_FORM_DEFAULTS);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateError, setUpdateError] = useState<string | null>(null);
+
+  function openEdit(channel: NonNullable<typeof channels>[number]) {
+    setEditingChannel(channel);
+    setUpdateError(null);
+    setEditForm({
+      complianceStatus: channel.complianceStatus ?? 'pending',
+      email: channel.email ?? '',
+      phone: channel.phone ?? '',
+      taxIdNumber: channel.taxIdNumber ?? '',
+      notes: channel.notes ?? '',
+      estimatedMonthlyRevenue: '',
+      estimatedAnnualRevenue: channel.estimatedAnnualRevenue?.toString() ?? '',
+    });
+  }
 
   const connectSuccess = searchParams.get('connectSuccess');
   const connectError = searchParams.get('connectError');
@@ -204,6 +246,45 @@ export default function InfluencersPage() {
       console.error('Failed to create channel:', error);
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  // ── Update (edit) handler ──────────────────────────────────────────────────
+  const handleUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!editingChannel?.docId) return;
+
+    setIsUpdating(true);
+    setUpdateError(null);
+
+    try {
+      const annualRevenue = editForm.estimatedAnnualRevenue
+        ? Number(editForm.estimatedAnnualRevenue)
+        : editForm.estimatedMonthlyRevenue
+          ? Number(editForm.estimatedMonthlyRevenue) * 12
+          : undefined;
+
+      await updateChannel({
+        id: editingChannel.docId,
+        name: editingChannel.name || undefined,
+        complianceStatus: editForm.complianceStatus,
+        email: editForm.email || undefined,
+        phone: editForm.phone || undefined,
+        taxIdNumber: editForm.taxIdNumber || undefined,
+        notes: editForm.notes || undefined,
+        estimatedAnnualRevenue: annualRevenue,
+        estimatedMonthlyRevenue: editForm.estimatedMonthlyRevenue
+          ? Number(editForm.estimatedMonthlyRevenue)
+          : undefined,
+      });
+
+      setEditingChannel(null);
+      setEditForm(EDIT_FORM_DEFAULTS);
+    } catch (error) {
+      console.error('Failed to update channel:', error);
+      setUpdateError(error instanceof Error ? error.message : 'Update failed. Please try again.');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -409,7 +490,15 @@ export default function InfluencersPage() {
                     </td>
 
                     <td className='px-4 py-4 text-center'>
-                      <StatusBadge status={channel.complianceStatus ?? 'pending'} />
+                      {/* Clicking the badge is a shortcut to open the edit sheet */}
+                      <button
+                        type='button'
+                        onClick={() => channel.docId ? openEdit(channel) : undefined}
+                        title={channel.docId ? 'Click to change compliance status' : 'Re-import this channel to enable editing'}
+                        className={channel.docId ? 'cursor-pointer rounded-full transition-opacity hover:opacity-70' : 'cursor-not-allowed'}
+                      >
+                        <StatusBadge status={channel.complianceStatus ?? 'pending'} />
+                      </button>
                     </td>
 
                     <td className='px-4 py-4 text-right'>
@@ -428,6 +517,26 @@ export default function InfluencersPage() {
                             {channel.hasConnectedAnalytics ? 'Reconnect' : 'Connect YouTube'}
                           </Button>
                         ) : null}
+
+                        {/* Edit button — only available for channels-table records */}
+                        {channel.docId ? (
+                          <button
+                            onClick={() => openEdit(channel)}
+                            className='flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground'
+                            title='Edit channel details and compliance status'
+                          >
+                            <HugeiconsIcon icon={Edit01Icon} size={12} />
+                            Edit
+                          </button>
+                        ) : (
+                          <span
+                            className='cursor-not-allowed text-xs text-muted-foreground/40'
+                            title='Re-import this channel via Channel Lookup to enable editing'
+                          >
+                            Edit
+                          </span>
+                        )}
+
                         <button
                           onClick={() =>
                             deleteChannel({
@@ -602,6 +711,240 @@ export default function InfluencersPage() {
                   className='bg-primary text-primary-foreground hover:bg-primary/90'
                 >
                   {isCreating ? 'Adding...' : 'Add Channel'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* ── Edit Channel Sheet ─────────────────────────────────────────────── */}
+      <Sheet
+        open={Boolean(editingChannel)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingChannel(null);
+            setEditForm(EDIT_FORM_DEFAULTS);
+            setUpdateError(null);
+          }
+        }}
+      >
+        <SheetContent className='w-full overflow-y-auto p-0 sm:max-w-md'>
+          <div className='px-6 pt-6 pb-6'>
+            <SheetHeader className='mb-6 p-0'>
+              <SheetTitle className='font-heading text-xl font-bold'>Edit Channel</SheetTitle>
+              <SheetDescription className='text-sm'>
+                {editingChannel?.name ?? 'Unknown channel'}
+                {editingChannel?.handle ? (
+                  <span className='ml-1 font-mono text-xs'>@{editingChannel.handle}</span>
+                ) : null}
+              </SheetDescription>
+            </SheetHeader>
+
+            <form onSubmit={handleUpdate} className='space-y-6'>
+              {/* ── Compliance Status — most important field, shown first ── */}
+              <div className='rounded-xl border border-border/60 bg-muted/20 p-4'>
+                <p className='mb-3 text-xs font-bold tracking-wider text-muted-foreground uppercase'>
+                  Compliance Status
+                </p>
+                <div className='grid gap-2'>
+                  <Select
+                    value={editForm.complianceStatus}
+                    onValueChange={(value) =>
+                      setEditForm({
+                        ...editForm,
+                        complianceStatus: value as EditForm['complianceStatus'],
+                      })
+                    }
+                  >
+                    <SelectTrigger id='edit-complianceStatus' className='bg-background'>
+                      <SelectValue placeholder='Select status' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value='pending'>
+                        <span className='flex items-center gap-2'>
+                          <span className='inline-block h-2 w-2 rounded-full bg-yellow-500/70' />
+                          Pending
+                        </span>
+                      </SelectItem>
+                      <SelectItem value='under-review'>
+                        <span className='flex items-center gap-2'>
+                          <span className='inline-block h-2 w-2 rounded-full bg-blue-500/70' />
+                          Under Review
+                        </span>
+                      </SelectItem>
+                      <SelectItem value='compliant'>
+                        <span className='flex items-center gap-2'>
+                          <span className='inline-block h-2 w-2 rounded-full bg-green-500/70' />
+                          Compliant
+                        </span>
+                      </SelectItem>
+                      <SelectItem value='non-compliant'>
+                        <span className='flex items-center gap-2'>
+                          <span className='inline-block h-2 w-2 rounded-full bg-red-500/70' />
+                          Non-Compliant
+                        </span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className='text-[11px] text-muted-foreground'>
+                    This status is visible to all officers and appears in reports and compliance
+                    breakdowns.
+                  </p>
+                </div>
+              </div>
+
+              {/* ── Contact Info ── */}
+              <div className='space-y-4'>
+                <p className='text-xs font-bold tracking-wider text-muted-foreground uppercase'>
+                  Contact Info
+                </p>
+
+                <div className='grid gap-2'>
+                  <Label
+                    htmlFor='edit-email'
+                    className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
+                  >
+                    Contact Email
+                  </Label>
+                  <Input
+                    id='edit-email'
+                    type='email'
+                    value={editForm.email}
+                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                    placeholder='creator@example.com'
+                    className='bg-secondary/20'
+                  />
+                </div>
+
+                <div className='grid gap-2'>
+                  <Label
+                    htmlFor='edit-phone'
+                    className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
+                  >
+                    Phone Number
+                  </Label>
+                  <Input
+                    id='edit-phone'
+                    type='tel'
+                    value={editForm.phone}
+                    onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                    placeholder='+233 XX XXX XXXX'
+                    className='bg-secondary/20'
+                  />
+                </div>
+
+                <div className='grid gap-2'>
+                  <Label
+                    htmlFor='edit-taxId'
+                    className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
+                  >
+                    Tax ID Number
+                  </Label>
+                  <Input
+                    id='edit-taxId'
+                    value={editForm.taxIdNumber}
+                    onChange={(e) => setEditForm({ ...editForm, taxIdNumber: e.target.value })}
+                    placeholder='GHA-XXXXX'
+                    className='bg-secondary/20'
+                  />
+                </div>
+              </div>
+
+              {/* ── Financial Override ── */}
+              <div className='space-y-4'>
+                <p className='text-xs font-bold tracking-wider text-muted-foreground uppercase'>
+                  Revenue Override ({currencyConfig.symbol})
+                </p>
+                <div className='grid grid-cols-2 gap-4'>
+                  <div className='grid gap-2'>
+                    <Label
+                      htmlFor='edit-monthlyRev'
+                      className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
+                    >
+                      Monthly
+                    </Label>
+                    <Input
+                      id='edit-monthlyRev'
+                      type='number'
+                      min='0'
+                      value={editForm.estimatedMonthlyRevenue}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, estimatedMonthlyRevenue: e.target.value })
+                      }
+                      placeholder='0'
+                      className='bg-secondary/20'
+                    />
+                  </div>
+                  <div className='grid gap-2'>
+                    <Label
+                      htmlFor='edit-annualRev'
+                      className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
+                    >
+                      Annual
+                    </Label>
+                    <Input
+                      id='edit-annualRev'
+                      type='number'
+                      min='0'
+                      value={editForm.estimatedAnnualRevenue}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, estimatedAnnualRevenue: e.target.value })
+                      }
+                      placeholder='Auto from monthly'
+                      className='bg-secondary/20'
+                    />
+                  </div>
+                </div>
+                <p className='text-[11px] text-muted-foreground'>
+                  Leave blank to keep existing revenue source. Connected analytics data is not
+                  affected.
+                </p>
+              </div>
+
+              {/* ── Notes ── */}
+              <div className='grid gap-2'>
+                <Label
+                  htmlFor='edit-notes'
+                  className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'
+                >
+                  Officer Notes
+                </Label>
+                <Input
+                  id='edit-notes'
+                  value={editForm.notes}
+                  onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                  placeholder='Reason for status change, review findings, etc.'
+                  className='bg-secondary/20'
+                />
+              </div>
+
+              {/* ── Error state ── */}
+              {updateError ? (
+                <div className='rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-xs text-destructive'>
+                  {updateError}
+                </div>
+              ) : null}
+
+              {/* ── Actions ── */}
+              <div className='flex justify-end gap-3 border-t border-border pt-4'>
+                <Button
+                  type='button'
+                  variant='outline'
+                  onClick={() => {
+                    setEditingChannel(null);
+                    setEditForm(EDIT_FORM_DEFAULTS);
+                    setUpdateError(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type='submit'
+                  disabled={isUpdating}
+                  className='bg-primary text-primary-foreground hover:bg-primary/90'
+                >
+                  {isUpdating ? 'Saving...' : 'Save Changes'}
                 </Button>
               </div>
             </form>

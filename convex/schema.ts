@@ -27,7 +27,7 @@ export default defineSchema({
     channelId: v.string(),
     handle: v.optional(v.string()),
     customUrl: v.optional(v.string()),
-    name: v.string(),
+    name: v.optional(v.string()),
     description: v.optional(v.string()),
     profileImageUrl: v.optional(v.string()),
     country: v.optional(v.string()),

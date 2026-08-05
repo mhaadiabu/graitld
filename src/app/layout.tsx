@@ -3,6 +3,7 @@ import { Manrope, DM_Sans, JetBrains_Mono } from 'next/font/google';
 
 import { ThemeProvider } from '@/components/theme-provider';
 import { PRODUCT_DESCRIPTION, PRODUCT_NAME } from '@/lib/product';
+import { getToken } from '@/lib/auth-server';
 
 import { ConvexClientProvider } from './ConvexClientProvider';
 
@@ -38,11 +39,12 @@ export const metadata: Metadata = {
  * @returns The root `<html>` element containing a `<body>` with global font classes and providers that supply theme and Convex client context to `children`.
  */
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const token = await getToken();
   return (
     <html lang='en' suppressHydrationWarning>
       <body
@@ -54,7 +56,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ConvexClientProvider>{children}</ConvexClientProvider>
+          <ConvexClientProvider initialToken={token}>{children}</ConvexClientProvider>
         </ThemeProvider>
       </body>
     </html>
